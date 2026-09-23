@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>conch</title>
+
+    <!-- Prevents flash on page load by setting theme before body renders -->
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..400,0..1,-50..200&icon_names=apps,child_care,dark_mode,history_edu,keyboard,rule,school,tune,light_mode,list_alt" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/img/favicon.png">
+</head>
+<body>
+    <div class="bg">
+        <div class="header">
+            <div class="logo">
+                conch
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="material-symbols-outlined light-icon">light_mode</span>
+                <span class="material-symbols-outlined dark-icon" style="display: none;">dark_mode</span>
+            </button>
+        </div>
+        <div class="subheader">
+            <div class="bar">
+                <div class="bars">
+                    <button class="pill">
+                        <span class="material-symbols-outlined">child_care</span>
+                        <span>easy</span>
+                    </button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">school</span>
+                        <span>normal</span>
+                    </button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">history_edu</span>
+                        <span>hard</span>
+                    </button>
+                </div>
+                <div class="bar-title">
+                    difficulty
+                </div>
+            </div>
+            <div class="bar">
+                <div class="bars">
+                    <button class="pill">
+                        <span class="material-symbols-outlined">apps</span>
+                        all
+                    </button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">list_alt</span>
+                        mc</button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">rule</span>
+                        true/false</button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">keyboard</span>
+                        fill-in</button>
+                </div>
+                <div class="bar-title">
+                    mode
+                </div>
+            </div>
+            <div class="bar">
+                <div class="bars">
+                    <button class="pill">5</button>
+                    <button class="pill">10</button>
+                    <button class="pill">20</button>
+                    <button class="pill">
+                        <span class="material-symbols-outlined">tune</span>
+                        <span>custom</span>
+                    </button>
+                </div>
+                <div class="bar-title">
+                    questions
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="hero">
+                <div class="text">
+                    What's today's topic?
+                </div>
+                <div class="input-container">
+                
+                <input 
+                    type="file" 
+                    id="file-attachment" 
+                    accept=".pdf, .docx, application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                    hidden/>
+                <label for="file-attachment" class="attachment-btn" title="Attach PDF or DOCX" aria-label="Attach file">
+                    ＋
+                </label>
+
+                <input 
+                    type="text" 
+                    class="topic-input" 
+                    placeholder="Type a topic..." />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="theme.js"></script>
+</body>
+</html>
