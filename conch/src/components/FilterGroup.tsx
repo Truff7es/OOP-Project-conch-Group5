@@ -1,7 +1,7 @@
 interface FilterGroupProps {
   label: string
   options: string[]
-  icons?: string[] // Optional in case a filter has no icons
+  icons?: string[]
   selected: string
   onSelect: (option: string) => void
 }
@@ -14,34 +14,27 @@ export default function FilterGroup({
   onSelect,
 }: FilterGroupProps) {
   return (
-    <div className="bar flex flex-col items-center gap-1">
-      <div className="h-9 bars flex gap-1.5 bg-gray-100 dark:bg-neutral-600 p-1 rounded-2xl pl-3 pr-3">
+    <div className="bar-group">
+      <div className="bar-pill-group">
         {options.map((option, index) => {
           const icon = icons?.[index]
+          const isSelected = selected === option
 
           return (
             <button
               key={option}
+              type="button"
+              className={`pill ${isSelected ? 'is-active' : ''}`}
               onClick={() => onSelect(option)}
-              className={`pill flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-mono transition cursor-pointer ${
-                selected === option
-                  ? 'text-black dark:text-white'
-                  : 'text-neutral-400 dark:hover:text-white'
-              }`}
+              aria-pressed={isSelected}
             >
-              {icon && (
-                <span className="material-symbols-outlined text-[16px]">
-                  {icon}
-                </span>
-              )}
+              {icon ? <span className="material-symbols-outlined">{icon}</span> : null}
               <span>{option}</span>
             </button>
           )
         })}
       </div>
-      <span className="bar-title text-s text-neutral-400 font-mono">
-        {label}
-      </span>
+      <span className="bar-title">{label}</span>
     </div>
   )
 }

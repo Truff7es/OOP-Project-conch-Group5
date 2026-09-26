@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Conch favicon">
+  <rect width="64" height="64" rx="18" fill="#b3cbdf"/>
+  <path d="M18 28c0-9 7-16 16-16s16 7 16 16v8c0 9-7 16-16 16s-16-7-16-16v-8zm8 0v8c0 5 3 8 8 8s8-3 8-8v-8c0-5-3-8-8-8s-8 3-8 8z" fill="#3d6073"/>
+  <circle cx="26" cy="32" r="2.7" fill="#f9fbfd"/>
+  <circle cx="38" cy="32" r="2.7" fill="#f9fbfd"/>
+</svg>

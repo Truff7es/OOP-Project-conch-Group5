@@ -1,2 +1,311 @@
-@import "tailwindcss";
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..400,0..1,-50..200&icon_names=apps,child_care,dark_mode,history_edu,keyboard,light_mode,list_alt,rule,school,tune');
+
+:root,
+html[data-theme='light'] {
+  --bg: #f9fbfd;
+  --bar: #b3cbdf;
+  --primary-text: #3d6073;
+}
+
+html[data-theme='dark'] {
+  --bg: #0d151c;
+  --bar: #233443;
+  --primary-text: #8fb2cb;
+}
+
+:root {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', 'Consolas', monospace;
+  color: var(--primary-text);
+  background-color: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--primary-text);
+  transition: background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease, opacity 0.34s ease;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--primary-text);
+  transition: background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease, opacity 0.34s ease;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--primary-text);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18px 0 32px;
+  transition: background-color 0.34s ease, color 0.34s ease;
+}
+
+.app-frame {
+  width: 70vw;
+  max-width: 1200px;
+  min-height: 70vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0 1rem;
+}
+
+.logo {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  color: var(--primary-text);
+}
+
+.theme-toggle {
+  width: 48px;
+  height: 48px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary-text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.34s ease, background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle .material-symbols-outlined {
+  font-size: 32px;
+}
+
+.subheader {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 1.1rem 0 0;
+  flex-wrap: wrap;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bar-pill-group {
+  background: var(--bar);
+  border-radius: 18px;
+  padding: 0.35rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: background-color 0.34s ease, color 0.34s ease, border-color 0.34s ease, opacity 0.34s ease;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(61, 96, 115, 0.8);
+  padding: 0.55rem 0.8rem;
+  min-height: 2.25rem;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: background-color 0.34s ease, color 0.34s ease, opacity 0.34s ease, transform 0.34s ease;
+}
+
+html[data-theme='dark'] .pill {
+  color: rgba(143, 178, 203, 0.8);
+}
+
+.pill:hover {
+  opacity: 0.5;
+}
+
+.pill.is-active {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--primary-text);
+}
+
+html[data-theme='light'] .pill.is-active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.pill .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.bar-title {
+  color: var(--primary-text);
+  opacity: 0.7;
+  font-size: 0.75rem;
+  text-transform: lowercase;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.hero-section {
+  width: min(100%, 700px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding-top: 3rem;
+}
+
+.hero-section h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2vw + 1.2rem, 3rem);
+  line-height: 1.2;
+  color: var(--primary-text);
+  text-align: center;
+}
+
+.input-shell {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(61, 96, 115, 0.35);
+  border-radius: 32px;
+  background: var(--bar);
+  padding: 0.6rem 0.9rem 0.6rem 0.5rem;
+  transition: background-color 0.34s ease, border-color 0.34s ease, color 0.34s ease;
+}
+
+.attachment-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary-text);
+  font-size: 2rem;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.34s ease, transform 0.34s ease, color 0.34s ease;
+}
+
+.attachment-btn:hover {
+  opacity: 0.7;
+}
+
+.topic-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--primary-text);
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 0.8rem 0.4rem 0.8rem 0;
+  outline: none;
+}
+
+.topic-input::placeholder {
+  color: var(--primary-text);
+  opacity: 0.7;
+}
+
+.file-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.2rem;
+  color: var(--primary-text);
+  opacity: 0.8;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .app-frame {
+    width: 85vw;
+  }
+
+  .subheader {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-frame {
+    width: 92vw;
+  }
+
+  .header {
+    padding-top: 0.25rem;
+  }
+
+  .logo {
+    font-size: 2.5rem;
+  }
+
+  .bar-pill-group {
+    flex-wrap: wrap;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .pill {
+    font-size: 0.72rem;
+    padding: 0.45rem 0.7rem;
+  }
+}
 
