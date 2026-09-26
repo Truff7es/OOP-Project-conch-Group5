@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import Navbar from './components/Navbar'
 import FilterGroup from './components/FilterGroup'
 import HeroInput from './components/HeroInput'
+import lightModeSound from './assets/sfx/lightmodereal.wav'
+import darkModeSound from './assets/sfx/darkmodereal.wav'
 
 const getInitialTheme = (): 'light' | 'dark' => {
   if (typeof window === 'undefined') {
@@ -27,8 +29,8 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
-    const lightAudio = new Audio('/assets/sfx/lightmodereal.wav')
-    const darkAudio = new Audio('/assets/sfx/darkmodereal.wav')
+    const lightAudio = new Audio(lightModeSound)
+    const darkAudio = new Audio(darkModeSound)
 
     lightAudio.preload = 'auto'
     darkAudio.preload = 'auto'
