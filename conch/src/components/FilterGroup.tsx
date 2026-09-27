@@ -13,31 +13,65 @@ export default function FilterGroup({
   selected,
   onSelect,
 }: FilterGroupProps) {
-  return (
-    <div className="bar flex flex-col items-center gap-1">
-      <div className="h-10 bars flex gap-2 bg-neutral-200 p-1 rounded-2xl pl-4 pr-4">
-        {options.map((option, index) => {
-          const icon = icons?.[index]
+  const [highlightStyle, setHighlightStyle] = useState({ left: '0px', width: '0px' })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const pipSoundRef = useRef(new Audio(pipSound))
 
-          return (
-            <button
-              key={option}
-              onClick={() => onSelect(option)}
-              className={`pill flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-mono transition cursor-pointer ${
-                selected === option
-                  ? 'text-black'
-                  : 'text-neutral-400 hover:text-black'
-              }`}
-            >
-              {icon && (
-                <span className="material-symbols-outlined text-2xl">
-                  {icon}
-                </span>
-              )}
-              <span>{option}</span>
-            </button>
-          )
-        })}
+  const updateHighlight = () => {
+    const selectedPill = pillRefs.current[selected]
+    const container = containerRef.current
+
+    if (selectedPill && container) {
+      const { left: containerLeft } = container.getBoundingClientRect()
+      const { left: pillLeft, width } = selectedPill.getBoundingClientRect()
+      setHighlightStyle({ 
+        left: `${pillLeft - containerLeft}px`, 
+        width: `${width}px` 
+      })
+    }
+  }
+
+  useEffect(() => {
+    document.fonts.ready?.then(() => requestAnimationFrame(updateHighlight))
+  }, [selected])
+
+  useEffect(() => {
+    window.addEventListener('resize', updateHighlight)
+    return () => window.removeEventListener('resize', updateHighlight)
+  }, [selected])
+
+  const playSound = () => {
+    pipSoundRef.current.currentTime = 0
+    pipSoundRef.current.play().catch(() => {})
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className="relative bg-light-bar dark:bg-dark-bar rounded-[18px] px-4 py-[0.35rem] flex items-center justify-center gap-[0.35rem] overflow-hidden"
+        ref={containerRef}
+      >
+        <div
+          className="absolute top-1/2 -translate-y-1/2 h-[70%] bg-white/25 rounded-full pointer-events-none z-0 transition-[left,width] duration-150 ease-out"
+          style={highlightStyle}
+        />
+        {options.map((option, index) => (
+          <button
+            key={option}
+            ref={(el) => { pillRefs.current[option] = el }}
+            type="button"
+            className="relative z-10 inline-flex items-center justify-center gap-1 border-none rounded-full bg-transparent px-3 py-[0.55rem] min-h-9 text-xs font-mono text-light-text/80 dark:text-dark-text/80 lowercase cursor-pointer transition-colors hover:opacity-50"
+            onClick={() => {
+              playSound()
+              onSelect(option)
+            }}
+            aria-pressed={selected === option}
+          >
+            {icons?.[index] && <span className="material-symbols-outlined text-[15px]">{icons[index]}</span>}
+            <span>{option}</span>
+          </button>
+        ))}
       </div>
       <span className="bar-title text-s text-neutral-400 font-mono">
         {label}

@@ -1,1 +1,33 @@
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
 @import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", monospace;
+  --color-light-bg: #f9fbfd;
+  --color-light-bar: #b3cbdf;
+  --color-light-text: #3d6073;
+  --color-dark-bg: #0d151c;
+  --color-dark-bar: #233443;
+  --color-dark-text: #8fb2cb;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes charDrop {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100px) rotateZ(0deg) translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
