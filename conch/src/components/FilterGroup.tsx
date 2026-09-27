@@ -27,8 +27,8 @@ export default function FilterGroup({
     pipSoundRef.current = audio
   }
 
-  useEffect(() => {
-    const selectedPill = pillRefs.current[selected]
+  const updateHighlight = (optionToHighlight: string) => {
+    const selectedPill = pillRefs.current[optionToHighlight]
     const container = containerRef.current
 
     if (selectedPill && container) {
@@ -39,6 +39,40 @@ export default function FilterGroup({
       const width = pillRect.width
 
       setHighlightStyle({ left: `${left}px`, width: `${width}px` })
+    }
+  }
+
+  useEffect(() => {
+    // Wait for fonts to load
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        requestAnimationFrame(() => {
+          updateHighlight(selected)
+        })
+      })
+    } else {
+      // Fallback if fonts API not available
+      const frameId = requestAnimationFrame(() => {
+        updateHighlight(selected)
+      })
+      return () => cancelAnimationFrame(frameId)
+    }
+  }, [selected])
+
+  // Also update on window resize
+  useEffect(() => {
+    let frameId: number
+    
+    const handleResize = () => {
+      frameId = requestAnimationFrame(() => {
+        updateHighlight(selected)
+      })
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(frameId)
     }
   }, [selected])
 
@@ -60,7 +94,7 @@ export default function FilterGroup({
         ref={containerRef}
       >
         <div
-          className="pill-highlight"
+          className="absolute top-1/2 -translate-y-1/2 h-[70%] bg-white/25 rounded-full pointer-events-none z-0 transition-[left,width] duration-150 ease-out"
           style={{
             left: highlightStyle.left,
             width: highlightStyle.width,

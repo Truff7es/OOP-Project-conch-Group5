@@ -66,7 +66,7 @@ export default function HeroInput() {
   }
 
   return (
-    <section className="w-full max-w-175 flex flex-col items-center justify-center gap-5 pt-12">
+    <section className="w-full max-w-[700px] flex flex-col items-center justify-center gap-5 pt-12">
       <h1 className="m-0 text-[clamp(2rem,2vw+1.2rem,3rem)] leading-tight text-light-text dark:text-dark-text text-center font-mono">
         What's today's topic?
       </h1>
@@ -103,13 +103,13 @@ export default function HeroInput() {
             {deletedChars.map((item) => (
               <div
                 key={item.id}
-                className="deleted-char"
-                style={
-                  {
-                    '--char-index': item.index,
-                    '--random-x-offset': (Math.random() - 0.5) * 8,
-                  } as React.CSSProperties
-                }
+                className="absolute top-1/2 left-0 text-lg leading-[1.4] px-1 py-2 whitespace-nowrap text-light-text dark:text-dark-text font-mono"
+                style={{
+                  '--char-index': item.index,
+                  '--random-x-offset': (Math.random() - 0.5) * 8,
+                  animation: 'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
+                  marginLeft: `calc(var(--char-index) * 0.6em)`,
+                } as React.CSSProperties}
               >
                 {item.char}
               </div>
