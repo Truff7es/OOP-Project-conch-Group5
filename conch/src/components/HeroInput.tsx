@@ -66,10 +66,12 @@ export default function HeroInput() {
   }
 
   return (
-    <section className="hero-section">
-      <h1>What's today's topic?</h1>
+    <section className="w-full max-w-[700px] flex flex-col items-center justify-center gap-5 pt-12">
+      <h1 className="m-0 text-[clamp(2rem,2vw+1.2rem,3rem)] leading-tight text-light-text dark:text-dark-text text-center font-mono">
+        What's today's topic?
+      </h1>
 
-      <div className="input-shell">
+      <div className="w-full flex items-center gap-3 border border-light-text/35 dark:border-dark-text/35 rounded-full bg-light-bar dark:bg-dark-bar p-[0.6rem_0.9rem_0.6rem_0.5rem] transition-colors">
         <input
           type="file"
           id="file-attachment"
@@ -78,21 +80,26 @@ export default function HeroInput() {
           onChange={handleFileChange}
         />
 
-        <label htmlFor="file-attachment" className="attachment-btn" title={selectedFile ? selectedFile.name : 'Attach PDF or DOCX'}>
+        <label
+          htmlFor="file-attachment"
+          className="flex-shrink-0 w-10 h-10 rounded-full bg-transparent text-light-text dark:text-dark-text text-2xl grid place-items-center cursor-pointer select-none transition-opacity hover:opacity-70"
+          title={selectedFile ? selectedFile.name : 'Attach PDF or DOCX'}
+        >
           ＋
         </label>
 
-        <div className="topic-input-wrapper">
+        <div className="flex-1 relative overflow-hidden">
           <input
             type="text"
             value={topic}
             onChange={handleChange}
-            className="topic-input"
+            className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono"
             placeholder={isFocused || topic ? '' : 'Type a topic...'}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            spellCheck="false"
           />
-          <div className="deleted-chars-container">
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
             {deletedChars.map((item) => (
               <div
                 key={item.id}
@@ -111,7 +118,11 @@ export default function HeroInput() {
         </div>
       </div>
 
-      {selectedFile && <span className="file-status">Attached: {selectedFile.name}</span>}
+      {selectedFile && (
+        <span className="inline-flex items-center justify-center min-h-5 text-light-text/80 dark:text-dark-text/80 text-sm">
+          Attached: {selectedFile.name}
+        </span>
+      )}
     </section>
   )
 }

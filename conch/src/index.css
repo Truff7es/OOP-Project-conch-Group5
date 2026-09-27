@@ -1,56 +1,37 @@
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
 @import '@fontsource/jetbrains-mono/700.css';
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..400,0..1,-50..200&icon_names=apps,child_care,dark_mode,history_edu,keyboard,light_mode,list_alt,rule,school,tune');
 
-:root,
-html[data-theme='light'] {
-  --bg: #f9fbfd;
-  --bar: #b3cbdf;
-  --primary-text: #3d6073;
+@import "tailwindcss";
+
+/*
+ * Tailwind v4 theme
+ */
+@theme {
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-light-bg: #f9fbfd;
+  --color-light-bar: #b3cbdf;
+  --color-light-text: #3d6073;
+
+  --color-dark-bg: #0d151c;
+  --color-dark-bar: #233443;
+  --color-dark-text: #8fb2cb;
 }
 
-html[data-theme='dark'] {
-  --bg: #0d151c;
-  --bar: #233443;
-  --primary-text: #8fb2cb;
-}
+/*
+ * Make dark:* respond to the .dark class on <html>
+ */
+@custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  font-family: 'JetBrains Mono', 'SFMono-Regular', 'Consolas', monospace;
-  color: var(--primary-text);
-  background-color: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@layer base {
+  html {
+    @apply font-mono;
+  }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  background-color: var(--bg);
-  color: var(--primary-text);
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background-color: var(--bg);
-  color: var(--primary-text);
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-#root {
-  min-height: 100vh;
+  body {
+    @apply bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text;
+  }
 }
 
 .material-symbols-outlined {
@@ -68,105 +49,12 @@ input {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-.app-shell {
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--primary-text);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 18px 0 32px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.app-frame {
-  width: 70vw;
-  max-width: 1200px;
-  min-height: 70vh;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0 1rem;
-}
-
-.logo {
-   font-family: 'JetBrains Mono';
-  font-size: 48px;
-  font-weight: 700;
-  letter-spacing: -0.08em;
-  color: var(--primary-text);
-}
-
-.theme-toggle {
-  width: 48px;
-  height: 48px;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--primary-text);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-}
-
-.theme-toggle .material-symbols-outlined {
-  font-size: 32px;
-}
-
-.subheader {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin: 1.1rem 0 0;
-  flex-wrap: wrap;
-}
-
-.bar-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.bar-pill-group {
-  background: var(--bar);
-  border-radius: 18px;
-  padding: 0.35rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
 .pill-highlight {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   height: 75%;
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 18px;
-  pointer-events: none;
-  transition: left 0.085s ease-out, width 0.15s ease-out;
-  z-index: 0;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-  border: none;
   border-radius: 999px;
   background: transparent;
   color: rgba(61, 96, 115, 0.8);
@@ -307,64 +195,29 @@ html[data-theme='light'] .pill.is-active {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
+  transition: left 0.12s ease-out, width 0.15s ease-out;
 }
 
 .deleted-char {
   position: absolute;
   top: 50%;
   left: 0;
-  color: var(--primary-text);
   font-size: 18px;
   line-height: 1.4;
-  padding: 0.8rem 0.4rem 0.8rem 0;
+  padding: 0.5rem 0.25rem;
   white-space: nowrap;
+  @apply text-light-text dark:text-dark-text;
   margin-left: calc(var(--char-index) * 0.6em);
-  animation: charDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation:
+    charDrop 0.4s linear forwards,
+    charFade 0.1s ease-in forwards 0.05s;
 }
 
-.file-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1.2rem;
-  color: var(--primary-text);
-  opacity: 0.8;
-  font-size: 0.8rem;
-}
-
-@media (max-width: 900px) {
-  .app-frame {
-    width: 85vw;
-  }
-
-  .subheader {
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .app-frame {
-    width: 92vw;
-  }
-
-  .header {
-    padding-top: 0.25rem;
-  }
-
-  .logo {
-    font-size: 2.5rem;
-  }
-
-  .bar-pill-group {
-    flex-wrap: wrap;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .pill {
-    font-size: 0.72rem;
-    padding: 0.45rem 0.7rem;
-  }
+.deleted-char.bounce {
+  animation:
+    charDropBounce 0.4s linear forwards,
+    charFade 0.1s ease-in forwards 0.05s;
 }
 
 @keyframes charDrop {
@@ -372,8 +225,38 @@ html[data-theme='light'] .pill.is-active {
     transform: translateY(-50%) rotateZ(0deg) translateX(0);
     opacity: 1;
   }
+
   100% {
-    transform: translateY(calc(-50% + var(--random-y-offset))) rotateZ(var(--random-rotation)) translateX(var(--random-x-offset));
+    transform: translateY(100px) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charDropBounce {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translateY(calc(-50% - 15px)) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+  }
+
+  100% {
+    transform: translateY(100px) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charFade {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
     opacity: 0;
   }
 }

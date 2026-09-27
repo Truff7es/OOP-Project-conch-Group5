@@ -21,7 +21,6 @@ export default function FilterGroup({
   const pillRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
   const pipSoundRef = useRef<HTMLAudioElement | null>(null)
 
-  // Initialize sound
   if (!pipSoundRef.current) {
     const audio = new Audio(pipSound)
     audio.preload = 'auto'
@@ -44,7 +43,6 @@ export default function FilterGroup({
   }, [selected])
 
   const handlePillClick = (option: string) => {
-    // Play pip sound
     if (pipSoundRef.current) {
       pipSoundRef.current.currentTime = 0
       pipSoundRef.current.play().catch((error) => {
@@ -56,8 +54,11 @@ export default function FilterGroup({
   }
 
   return (
-    <div className="bar-group">
-      <div className="bar-pill-group" ref={containerRef}>
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className="relative bg-light-bar dark:bg-dark-bar rounded-[18px] px-4 py-[0.35rem] flex items-center justify-center gap-[0.35rem] overflow-hidden"
+        ref={containerRef}
+      >
         <div
           className="pill-highlight"
           style={{
@@ -76,17 +77,17 @@ export default function FilterGroup({
                 if (el) pillRefs.current[option] = el
               }}
               type="button"
-              className={`pill ${isSelected ? 'is-active' : ''}`}
+              className="relative z-10 inline-flex items-center justify-center gap-1 border-none rounded-full bg-transparent px-3 py-[0.55rem] min-h-9 text-xs font-mono text-light-text/80 dark:text-dark-text/80 lowercase cursor-pointer transition-colors hover:opacity-50"
               onClick={() => handlePillClick(option)}
               aria-pressed={isSelected}
             >
-              {icon ? <span className="material-symbols-outlined">{icon}</span> : null}
+              {icon ? <span className="material-symbols-outlined text-[15px]">{icon}</span> : null}
               <span>{option}</span>
             </button>
           )
         })}
       </div>
-      <span className="bar-title">{label}</span>
+      <span className="text-light-text/70 dark:text-dark-text/70 text-xs lowercase">{label}</span>
     </div>
   )
 }

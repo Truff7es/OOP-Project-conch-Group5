@@ -11,7 +11,10 @@ const getInitialTheme = (): 'light' | 'dark' => {
   }
 
   const storedTheme = localStorage.getItem('theme')
-  return storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : 'light'
+
+  return storedTheme === 'dark' || storedTheme === 'light'
+    ? storedTheme
+    : 'light'
 }
 
 export default function App() {
@@ -25,6 +28,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.classList.toggle('dark', theme === 'dark')
     localStorage.setItem('theme', theme)
   }, [theme])
 
@@ -40,9 +44,7 @@ export default function App() {
   }, [])
 
   const playThemeSound = (audio: HTMLAudioElement | null) => {
-    if (!audio) {
-      return
-    }
+    if (!audio) return
 
     audio.currentTime = 0
     audio.play().catch((error) => {
@@ -52,6 +54,7 @@ export default function App() {
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
+
     setTheme(newTheme)
 
     if (newTheme === 'dark') {
@@ -62,11 +65,14 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <div className="app-frame">
-        <Navbar theme={theme} onToggleTheme={toggleTheme} />
+    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-[18px] pb-8">
+      <div className="w-[70vw] max-w-[1200px] min-h-[70vh]">
+        <Navbar
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
 
-        <div className="subheader">
+        <div className="flex justify-center gap-6 mt-[1.1rem] flex-wrap md:gap-4">
           <FilterGroup
             label="difficulty"
             options={['easy', 'normal', 'hard']}
@@ -74,6 +80,7 @@ export default function App() {
             selected={difficulty}
             onSelect={setDifficulty}
           />
+
           <FilterGroup
             label="mode"
             options={['all', 'mc', 'true/false', 'fill-in']}
@@ -81,6 +88,7 @@ export default function App() {
             selected={mode}
             onSelect={setMode}
           />
+
           <FilterGroup
             label="questions"
             options={['5', '10', '20', 'custom']}
@@ -90,7 +98,7 @@ export default function App() {
           />
         </div>
 
-        <div className="hero">
+        <div className="flex justify-center items-center min-h-[60vh]">
           <HeroInput />
         </div>
       </div>
