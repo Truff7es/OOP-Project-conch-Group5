@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Navbar from './components/Navbar'
 import FilterGroup from './components/FilterGroup'
 import HeroInput from './components/HeroInput'
+import QuestionCard from './components/QuestionCard'
 import lightModeSound from './assets/sfx/lightmodereal.wav'
 import darkModeSound from './assets/sfx/darkmodereal.wav'
 
@@ -103,8 +104,9 @@ export default function App() {
             onSelect={setQuestions}
           />
         </div>
-
-        <div className="flex justify-center items-center min-h-[60vh]">
+        
+        <div className="flex flex-col justify-center items-center min-h-[60vh]">
+          
           <HeroInput />
         </div>
       </div>
