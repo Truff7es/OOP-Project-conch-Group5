@@ -1,10 +1,7 @@
-import { useRef, useState, useEffect } from 'react'
-import pipSound from '../assets/sfx/pipsound.wav'
-
 interface FilterGroupProps {
   label: string
   options: string[]
-  icons?: string[]
+  icons?: string[] // Optional in case a filter has no icons
   selected: string
   onSelect: (option: string) => void
 }
@@ -76,7 +73,9 @@ export default function FilterGroup({
           </button>
         ))}
       </div>
-      <span className="text-light-text/70 dark:text-dark-text/70 text-xs lowercase">{label}</span>
+      <span className="bar-title text-s text-neutral-400 font-mono">
+        {label}
+      </span>
     </div>
   )
 }
