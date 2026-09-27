@@ -12,9 +12,29 @@
   --color-dark-bg: #0d151c;
   --color-dark-bar: #233443;
   --color-dark-text: #8fb2cb;
+  --color-light-selection: rgba(61, 96, 115, 0.3);
+  --color-dark-selection: rgba(143, 178, 203, 0.3);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    @apply font-mono;
+  }
+
+  input::selection,
+  textarea::selection {
+    background-color: var(--color-light-selection);
+    color: var(--color-light-text);
+  }
+
+  .dark input::selection,
+  .dark textarea::selection {
+    background-color: var(--color-dark-selection);
+    color: var(--color-dark-text);
+  }
+}
 
 @keyframes charDrop {
   0% {
@@ -30,10 +50,4 @@
 @keyframes charFade {
   0% { opacity: 1; }
   100% { opacity: 0; }
-}
-
-@layer base {
-  html {
-    @apply font-mono;
-  }
 }
