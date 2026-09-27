@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import typeSound from '../assets/sfx/type.wav'
 import typeBackSound from '../assets/sfx/typeback.wav'
@@ -11,7 +11,7 @@ export default function HeroInput() {
   const typeSoundRef = useRef<HTMLAudioElement | null>(null)
   const typeBackSoundRef = useRef<HTMLAudioElement | null>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const typeAudio = new Audio(typeSound)
     const typeBackAudio = new Audio(typeBackSound)
     typeAudio.preload = 'auto'
