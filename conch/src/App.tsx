@@ -5,7 +5,9 @@ import HeroInput from './components/HeroInput'
 import lightModeSound from './assets/sfx/lightmodereal.wav'
 import darkModeSound from './assets/sfx/darkmodereal.wav'
 
-const getInitialTheme = (): 'light' | 'dark' => {
+type Theme = 'light' | 'dark'
+
+const getInitialTheme = (): Theme => {
   if (typeof window === 'undefined') {
     return 'light'
   }
@@ -18,13 +20,13 @@ const getInitialTheme = (): 'light' | 'dark' => {
 }
 
 export default function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
   const [difficulty, setDifficulty] = useState('easy')
   const [mode, setMode] = useState('all')
   const [questions, setQuestions] = useState('5')
 
-  const lightModeSoundRef = useRef<HTMLAudioElement | null>(null)
-  const darkModeSoundRef = useRef<HTMLAudioElement | null>(null)
+  // Group audio instances into a single keyed ref map
+  const soundsRef = useRef<Record<Theme, HTMLAudioElement> | null>(null)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -33,17 +35,27 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
-    const lightAudio = new Audio(lightModeSound)
-    const darkAudio = new Audio(darkModeSound)
+    const audioMap: Record<Theme, HTMLAudioElement> = {
+      light: new Audio(lightModeSound),
+      dark: new Audio(darkModeSound),
+    }
 
-    lightAudio.preload = 'auto'
-    darkAudio.preload = 'auto'
+    Object.values(audioMap).forEach((audio) => {
+      audio.preload = 'auto'
+    })
 
-    lightModeSoundRef.current = lightAudio
-    darkModeSoundRef.current = darkAudio
+    soundsRef.current = audioMap
+
+    // Cleanup: pause audio on unmount to prevent leaks or orphaned playback
+    return () => {
+      if (soundsRef.current) {
+        Object.values(soundsRef.current).forEach((audio) => audio.pause())
+      }
+    }
   }, [])
 
-  const playThemeSound = (audio: HTMLAudioElement | null) => {
+  const playThemeSound = (targetTheme: Theme) => {
+    const audio = soundsRef.current?.[targetTheme]
     if (!audio) return
 
     audio.currentTime = 0
@@ -53,26 +65,20 @@ export default function App() {
   }
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-
-    setTheme(newTheme)
-
-    if (newTheme === 'dark') {
-      playThemeSound(darkModeSoundRef.current)
-    } else {
-      playThemeSound(lightModeSoundRef.current)
-    }
+    const nextTheme: Theme = theme === 'light' ? 'dark' : 'light'
+    setTheme(nextTheme)
+    playThemeSound(nextTheme)
   }
 
   return (
-    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-[18px] pb-8">
-      <div className="w-[70vw] max-w-[1200px] min-h-[70vh]">
+    <div className="min-h-screen bg-light-bg text-light-text flex items-start justify-center pt-4.5 pb-8">
+      <div className="w-3/5">
         <Navbar
           theme={theme}
           onToggleTheme={toggleTheme}
         />
 
-        <div className="flex justify-center gap-6 mt-[1.1rem] flex-wrap md:gap-4">
+        <div className="flex justify-center gap-8 flex-wrap">
           <FilterGroup
             label="difficulty"
             options={['easy', 'normal', 'hard']}
