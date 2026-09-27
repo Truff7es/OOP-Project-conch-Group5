@@ -65,8 +65,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-[18px] pb-8">
-      <div className="w-[70vw] max-w-[1200px] min-h-[70vh]">
+    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-4.5 pb-8">
+      <div className="w-[70vw] max-w-300 min-h-[70vh]">
         <Navbar
           theme={theme}
           onToggleTheme={toggleTheme}

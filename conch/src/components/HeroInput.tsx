@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useState, useLayoutEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import typeSound from '../assets/sfx/type.wav'
 import typeBackSound from '../assets/sfx/typeback.wav'
@@ -11,7 +11,7 @@ export default function HeroInput() {
   const typeSoundRef = useRef<HTMLAudioElement | null>(null)
   const typeBackSoundRef = useRef<HTMLAudioElement | null>(null)
 
-  useEffect(() => {
+useLayoutEffect(() => {
     const typeAudio = new Audio(typeSound)
     const typeBackAudio = new Audio(typeBackSound)
     typeAudio.preload = 'auto'
@@ -66,7 +66,7 @@ export default function HeroInput() {
   }
 
   return (
-    <section className="w-full max-w-[700px] flex flex-col items-center justify-center gap-5 pt-12">
+    <section className="w-full max-w-175 flex flex-col items-center justify-center gap-5 pt-12">
       <h1 className="m-0 text-[clamp(2rem,2vw+1.2rem,3rem)] leading-tight text-light-text dark:text-dark-text text-center font-mono">
         What's today's topic?
       </h1>
@@ -82,7 +82,7 @@ export default function HeroInput() {
 
         <label
           htmlFor="file-attachment"
-          className="flex-shrink-0 w-10 h-10 rounded-full bg-transparent text-light-text dark:text-dark-text text-2xl grid place-items-center cursor-pointer select-none transition-opacity hover:opacity-70"
+          className="shrink-0 w-10 h-10 rounded-full bg-transparent text-light-text dark:text-dark-text text-2xl grid place-items-center cursor-pointer select-none transition-opacity hover:opacity-70"
           title={selectedFile ? selectedFile.name : 'Attach PDF or DOCX'}
         >
           ＋
@@ -93,7 +93,7 @@ export default function HeroInput() {
             type="text"
             value={topic}
             onChange={handleChange}
-            className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono"
+            className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono transition-colors"
             placeholder={isFocused || topic ? '' : 'Type a topic...'}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
