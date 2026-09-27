@@ -1,23 +1,75 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
+import typeSound from '../assets/sfx/type.wav'
+import typeBackSound from '../assets/sfx/typeback.wav'
 
 export default function HeroInput() {
   const [topic, setTopic] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [deletedChars, setDeletedChars] = useState<Array<{ char: string; index: number; id: number }>>([])
+  const [isFocused, setIsFocused] = useState(false)
+  const typeSoundRef = useRef<HTMLAudioElement | null>(null)
+  const typeBackSoundRef = useRef<HTMLAudioElement | null>(null)
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0])
+  useEffect(() => {
+    const typeAudio = new Audio(typeSound)
+    const typeBackAudio = new Audio(typeBackSound)
+    typeAudio.preload = 'auto'
+    typeBackAudio.preload = 'auto'
+    typeSoundRef.current = typeAudio
+    typeBackSoundRef.current = typeBackAudio
+  }, [])
+
+  const playSound = (audio: HTMLAudioElement | null) => {
+    if (!audio) return
+    audio.currentTime = 0
+    audio.play().catch((error) => {
+      console.warn('Audio playback prevented:', error)
+    })
+  }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null
+    setSelectedFile(file)
+  }
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newTopic = event.target.value
+    const oldLength = topic.length
+
+    if (newTopic.length < oldLength) {
+      const deletedCount = oldLength - newTopic.length
+      playSound(typeBackSoundRef.current)
+
+      const newDeletedChars: Array<{ char: string; index: number; id: number }> = []
+      for (let i = 0; i < deletedCount; i++) {
+        const deletedIndex = newTopic.length + i
+        newDeletedChars.push({
+          char: topic[deletedIndex],
+          index: deletedIndex,
+          id: Date.now() + Math.random(),
+        })
+      }
+
+      setDeletedChars((prev) => [...prev, ...newDeletedChars])
+
+      setTimeout(() => {
+        setDeletedChars((prev) =>
+          prev.filter((c) => !newDeletedChars.some((nc) => nc.id === c.id))
+        )
+      }, 400)
+    } else if (newTopic.length > oldLength) {
+      playSound(typeSoundRef.current)
     }
+
+    setTopic(newTopic)
   }
 
   return (
-    <section className="hero flex flex-col items-center justify-center gap-4 mt-20">
-      <h1 className="text text-neutral-100 text-2xl md:text-3xl font-mono">
-        What's today's topic?
-      </h1>
+    <section className="hero-section">
+      <h1>What's today's topic?</h1>
 
-      <div className="border border-neutral-100 rounded-2xl input-container relative flex items-center w-full max-w-lg">
+      <div className="input-shell">
         <input
           type="file"
           id="file-attachment"
@@ -26,28 +78,40 @@ export default function HeroInput() {
           onChange={handleFileChange}
         />
 
-        <label
-          htmlFor="file-attachment"
-          className="attachment-btn cursor-pointer px-3 text-xl text-neutral-100"
-          title={selectedFile ? selectedFile.name : "Attach PDF or DOCX"}
-        >
+        <label htmlFor="file-attachment" className="attachment-btn" title={selectedFile ? selectedFile.name : 'Attach PDF or DOCX'}>
           ＋
         </label>
 
-        <input
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          className="topic-input text-neutral-100 w-full py-2 pr-3 focus:outline-none font-mono"
-          placeholder="Type a topic..."
-        />
+        <div className="topic-input-wrapper">
+          <input
+            type="text"
+            value={topic}
+            onChange={handleChange}
+            className="topic-input"
+            placeholder={isFocused || topic ? '' : 'Type a topic...'}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+          <div className="deleted-chars-container">
+            {deletedChars.map((item) => (
+              <div
+                key={item.id}
+                className="deleted-char"
+                style={
+                  {
+                    '--char-index': item.index,
+                    '--random-x-offset': (Math.random() - 0.5) * 8,
+                  } as React.CSSProperties
+                }
+              >
+                {item.char}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {selectedFile && (
-        <span className="text-xs text-neutral-500">
-          Attached: {selectedFile.name}
-        </span>
-      )}
+      {selectedFile && <span className="file-status">Attached: {selectedFile.name}</span>}
     </section>
   )
 }
