@@ -145,6 +145,20 @@ input {
   justify-content: center;
   gap: 0.35rem;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pill-highlight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 75%;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  pointer-events: none;
+  transition: left 0.085s ease-out, width 0.15s ease-out;
+  z-index: 0;
 }
 
 .pill {
@@ -162,7 +176,9 @@ input {
   font-family: 'JetBrains Mono', monospace;
   text-transform: lowercase;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 html[data-theme='dark'] .pill {
@@ -174,12 +190,11 @@ html[data-theme='dark'] .pill {
 }
 
 .pill.is-active {
-  background: rgba(255, 255, 255, 0.16);
   color: var(--primary-text);
 }
 
 html[data-theme='light'] .pill.is-active {
-  background: rgba(255, 255, 255, 0.35);
+  color: var(--primary-text);
 }
 
 .pill .material-symbols-outlined {
@@ -250,6 +265,11 @@ html[data-theme='light'] .pill.is-active {
   opacity: 0.7;
 }
 
+.topic-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
 .topic-input {
   flex: 1;
   border: none;
@@ -259,11 +279,37 @@ html[data-theme='light'] .pill.is-active {
   line-height: 1.4;
   padding: 0.8rem 0.4rem 0.8rem 0;
   outline: none;
+  position: relative;
+  z-index: 2;
+  width: 100%;
 }
 
 .topic-input::placeholder {
   color: var(--primary-text);
   opacity: 0.7;
+}
+
+.deleted-chars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.deleted-char {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  color: var(--primary-text);
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 0.8rem 0.4rem 0.8rem 0;
+  white-space: nowrap;
+  margin-left: calc(var(--char-index) * 0.6em);
+  animation: charDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .file-status {
@@ -310,3 +356,13 @@ html[data-theme='light'] .pill.is-active {
   }
 }
 
+@keyframes charDrop {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(-50% + var(--random-y-offset))) rotateZ(var(--random-rotation)) translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
