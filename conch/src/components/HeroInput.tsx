@@ -11,7 +11,7 @@ export default function HeroInput() {
   const typeSoundRef = useRef<HTMLAudioElement | null>(null)
   const typeBackSoundRef = useRef<HTMLAudioElement | null>(null)
 
-useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const typeAudio = new Audio(typeSound)
     const typeBackAudio = new Audio(typeBackSound)
     typeAudio.preload = 'auto'
