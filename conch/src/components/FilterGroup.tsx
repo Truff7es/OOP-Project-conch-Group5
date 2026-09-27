@@ -27,8 +27,8 @@ export default function FilterGroup({
     pipSoundRef.current = audio
   }
 
-  useEffect(() => {
-    const selectedPill = pillRefs.current[selected]
+  const updateHighlight = (optionToHighlight: string) => {
+    const selectedPill = pillRefs.current[optionToHighlight]
     const container = containerRef.current
 
     if (selectedPill && container) {
@@ -39,6 +39,39 @@ export default function FilterGroup({
       const width = pillRect.width
 
       setHighlightStyle({ left: `${left}px`, width: `${width}px` })
+    }
+  }
+
+  useEffect(() => {
+    // First measurement with requestAnimationFrame
+    let frameId = requestAnimationFrame(() => {
+      updateHighlight(selected)
+      
+      // Second measurement with a tiny delay to catch late layouts
+      const timeoutId = setTimeout(() => {
+        updateHighlight(selected)
+      }, 50)
+
+      return () => clearTimeout(timeoutId)
+    })
+
+    return () => cancelAnimationFrame(frameId)
+  }, [selected])
+
+  // Also update on window resize
+  useEffect(() => {
+    let frameId: number
+    
+    const handleResize = () => {
+      frameId = requestAnimationFrame(() => {
+        updateHighlight(selected)
+      })
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(frameId)
     }
   }, [selected])
 
