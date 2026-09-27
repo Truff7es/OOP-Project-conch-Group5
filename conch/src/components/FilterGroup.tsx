@@ -43,19 +43,20 @@ export default function FilterGroup({
   }
 
   useEffect(() => {
-    // First measurement with requestAnimationFrame
-    let frameId = requestAnimationFrame(() => {
-      updateHighlight(selected)
-      
-      // Second measurement with a tiny delay to catch late layouts
-      const timeoutId = setTimeout(() => {
+    // Wait for fonts to load
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        requestAnimationFrame(() => {
+          updateHighlight(selected)
+        })
+      })
+    } else {
+      // Fallback if fonts API not available
+      const frameId = requestAnimationFrame(() => {
         updateHighlight(selected)
-      }, 50)
-
-      return () => clearTimeout(timeoutId)
-    })
-
-    return () => cancelAnimationFrame(frameId)
+      })
+      return () => cancelAnimationFrame(frameId)
+    }
   }, [selected])
 
   // Also update on window resize
@@ -93,7 +94,7 @@ export default function FilterGroup({
         ref={containerRef}
       >
         <div
-          className="pill-highlight"
+          className="absolute top-1/2 -translate-y-1/2 h-[70%] bg-white/25 rounded-full pointer-events-none z-0 transition-[left,width] duration-150 ease-out"
           style={{
             left: highlightStyle.left,
             width: highlightStyle.width,

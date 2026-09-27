@@ -103,13 +103,13 @@ export default function HeroInput() {
             {deletedChars.map((item) => (
               <div
                 key={item.id}
-                className="deleted-char"
-                style={
-                  {
-                    '--char-index': item.index,
-                    '--random-x-offset': (Math.random() - 0.5) * 8,
-                  } as React.CSSProperties
-                }
+                className="absolute top-1/2 left-0 text-lg leading-[1.4] px-1 py-2 whitespace-nowrap text-light-text dark:text-dark-text font-mono"
+                style={{
+                  '--char-index': item.index,
+                  '--random-x-offset': (Math.random() - 0.5) * 8,
+                  animation: 'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
+                  marginLeft: `calc(var(--char-index) * 0.6em)`,
+                } as React.CSSProperties}
               >
                 {item.char}
               </div>
