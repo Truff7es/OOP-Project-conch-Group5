@@ -1,2 +1,262 @@
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
 @import "tailwindcss";
 
+/*
+ * Tailwind v4 theme
+ */
+@theme {
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-light-bg: #f9fbfd;
+  --color-light-bar: #b3cbdf;
+  --color-light-text: #3d6073;
+
+  --color-dark-bg: #0d151c;
+  --color-dark-bar: #233443;
+  --color-dark-text: #8fb2cb;
+}
+
+/*
+ * Make dark:* respond to the .dark class on <html>
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    @apply font-mono;
+  }
+
+  body {
+    @apply bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text;
+  }
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.pill-highlight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 75%;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(61, 96, 115, 0.8);
+  padding: 0.55rem 0.8rem;
+  min-height: 2.25rem;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme='dark'] .pill {
+  color: rgba(143, 178, 203, 0.8);
+}
+
+.pill:hover {
+  opacity: 0.5;
+}
+
+.pill.is-active {
+  color: var(--primary-text);
+}
+
+html[data-theme='light'] .pill.is-active {
+  color: var(--primary-text);
+}
+
+.pill .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.bar-title {
+  color: var(--primary-text);
+  opacity: 0.7;
+  font-size: 0.75rem;
+  text-transform: lowercase;
+}
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.hero-section {
+  width: min(100%, 700px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding-top: 3rem;
+}
+
+.hero-section h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2vw + 1.2rem, 3rem);
+  line-height: 1.2;
+  color: var(--primary-text);
+  text-align: center;
+}
+
+.input-shell {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(61, 96, 115, 0.35);
+  border-radius: 32px;
+  background: var(--bar);
+  padding: 0.6rem 0.9rem 0.6rem 0.5rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.attachment-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary-text);
+  font-size: 2rem;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.attachment-btn:hover {
+  opacity: 0.7;
+}
+
+.topic-input-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.topic-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--primary-text);
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 0.8rem 0.4rem 0.8rem 0;
+  outline: none;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.topic-input::selection {
+  background-color: var(--primary-text);
+  color: var(--bg);
+}
+
+.topic-input::-webkit-selection {
+  background-color: var(--primary-text);
+  color: var(--bg);
+}
+
+.topic-input::placeholder {
+  color: var(--primary-text);
+  opacity: 0.7;
+}
+
+.deleted-chars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  transition: left 0.12s ease-out, width 0.15s ease-out;
+}
+
+.deleted-char {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 0.5rem 0.25rem;
+  white-space: nowrap;
+  @apply text-light-text dark:text-dark-text;
+  margin-left: calc(var(--char-index) * 0.6em);
+  animation:
+    charDrop 0.4s linear forwards,
+    charFade 0.1s ease-in forwards 0.05s;
+}
+
+.deleted-char.bounce {
+  animation:
+    charDropBounce 0.4s linear forwards,
+    charFade 0.1s ease-in forwards 0.05s;
+}
+
+@keyframes charDrop {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100px) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charDropBounce {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translateY(calc(-50% - 15px)) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+  }
+
+  100% {
+    transform: translateY(100px) rotateZ(0deg)
+      translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charFade {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

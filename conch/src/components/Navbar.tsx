@@ -4,19 +4,22 @@ interface NavbarProps {
 }
 
 export default function Navbar({ theme, onToggleTheme }: NavbarProps) {
+  const showLightIcon = theme === 'light'
+
   return (
-    <header className="header flex items-center justify-between">
-      <div className="logo text-4xl font-mono tracking-tight text-neutral-100">
-        conch
-      </div>
-      <button 
-        onClick={onToggleTheme} 
-        className="theme-toggle p-2 rounded-full cursor-pointer"
+    <header className="flex items-center justify-between pb-4 pt-2">
+      <div className="text-5xl font-bold tracking-tighter">conch</div>
+      <button
+        type="button"
+        className="w-12 h-12 rounded-full grid place-items-center hover:scale-110 transition-transform duration-200"
+        onClick={onToggleTheme}
         aria-label="Toggle theme"
       >
-        <span className="material-symbols-outlined text-white">
-          {theme === 'light' ? 'light_mode' : 'dark_mode'}
-        </span>
+        {showLightIcon ? (
+          <span className="material-symbols-outlined text-2xl">light_mode</span>
+        ) : (
+          <span className="material-symbols-outlined text-2xl">dark_mode</span>
+        )}
       </button>
     </header>
   )

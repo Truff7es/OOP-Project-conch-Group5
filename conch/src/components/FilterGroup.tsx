@@ -1,7 +1,10 @@
+import { useRef, useState, useEffect } from 'react'
+import pipSound from '../assets/sfx/pipsound.wav'
+
 interface FilterGroupProps {
   label: string
   options: string[]
-  icons?: string[] // Optional in case a filter has no icons
+  icons?: string[]
   selected: string
   onSelect: (option: string) => void
 }
@@ -13,35 +16,78 @@ export default function FilterGroup({
   selected,
   onSelect,
 }: FilterGroupProps) {
+  const [highlightStyle, setHighlightStyle] = useState({ left: '0px', width: '0px' })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const pillRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({})
+  const pipSoundRef = useRef<HTMLAudioElement | null>(null)
+
+  if (!pipSoundRef.current) {
+    const audio = new Audio(pipSound)
+    audio.preload = 'auto'
+    pipSoundRef.current = audio
+  }
+
+  useEffect(() => {
+    const selectedPill = pillRefs.current[selected]
+    const container = containerRef.current
+
+    if (selectedPill && container) {
+      const containerRect = container.getBoundingClientRect()
+      const pillRect = selectedPill.getBoundingClientRect()
+
+      const left = pillRect.left - containerRect.left
+      const width = pillRect.width
+
+      setHighlightStyle({ left: `${left}px`, width: `${width}px` })
+    }
+  }, [selected])
+
+  const handlePillClick = (option: string) => {
+    if (pipSoundRef.current) {
+      pipSoundRef.current.currentTime = 0
+      pipSoundRef.current.play().catch((error) => {
+        console.warn('Audio playback prevented:', error)
+      })
+    }
+
+    onSelect(option)
+  }
+
   return (
-    <div className="bar flex flex-col items-center gap-1">
-      <div className="h-9 bars flex gap-1.5 bg-gray-100 dark:bg-neutral-600 p-1 rounded-2xl pl-3 pr-3">
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className="relative bg-light-bar dark:bg-dark-bar rounded-[18px] px-4 py-[0.35rem] flex items-center justify-center gap-[0.35rem] overflow-hidden"
+        ref={containerRef}
+      >
+        <div
+          className="pill-highlight"
+          style={{
+            left: highlightStyle.left,
+            width: highlightStyle.width,
+          }}
+        />
         {options.map((option, index) => {
           const icon = icons?.[index]
+          const isSelected = selected === option
 
           return (
             <button
               key={option}
-              onClick={() => onSelect(option)}
-              className={`pill flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-mono transition cursor-pointer ${
-                selected === option
-                  ? 'text-black dark:text-white'
-                  : 'text-neutral-400 dark:hover:text-white'
-              }`}
+              ref={(el) => {
+                if (el) pillRefs.current[option] = el
+              }}
+              type="button"
+              className="relative z-10 inline-flex items-center justify-center gap-1 border-none rounded-full bg-transparent px-3 py-[0.55rem] min-h-9 text-xs font-mono text-light-text/80 dark:text-dark-text/80 lowercase cursor-pointer transition-colors hover:opacity-50"
+              onClick={() => handlePillClick(option)}
+              aria-pressed={isSelected}
             >
-              {icon && (
-                <span className="material-symbols-outlined text-[16px]">
-                  {icon}
-                </span>
-              )}
+              {icon ? <span className="material-symbols-outlined text-[15px]">{icon}</span> : null}
               <span>{option}</span>
             </button>
           )
         })}
       </div>
-      <span className="bar-title text-s text-neutral-400 font-mono">
-        {label}
-      </span>
+      <span className="text-light-text/70 dark:text-dark-text/70 text-xs lowercase">{label}</span>
     </div>
   )
 }
