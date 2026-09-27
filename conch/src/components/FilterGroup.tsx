@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import pipSound from '../assets/sfx/pipsound.wav'
 
 interface FilterGroupProps {
   label: string
@@ -22,10 +23,13 @@ export default function FilterGroup({
 
   // Initialize audio on mount
   useEffect(() => {
-    // Try to load the pip sound - adjust the path if your file is named differently
-    const audio = new Audio('/sfx/pip.wav')
-    audio.preload = 'auto'
+    const audio = new Audio(pipSound)
+    audio.volume = 0.5 // Set a reasonable volume
     pipSoundRef.current = audio
+    
+    return () => {
+      audio.pause()
+    }
   }, [])
 
   const updateHighlight = () => {
@@ -52,10 +56,12 @@ export default function FilterGroup({
   }, [selected])
 
   const playSound = () => {
-    if (pipSoundRef.current) {
-      pipSoundRef.current.currentTime = 0
-      pipSoundRef.current.play().catch(() => {})
-    }
+    // Create a fresh audio element each time to avoid browser restrictions
+    const audio = new Audio(pipSound)
+    audio.volume = 0.5
+    audio.play().catch(error => {
+      console.warn('Audio play failed:', error)
+    })
   }
 
   return (
