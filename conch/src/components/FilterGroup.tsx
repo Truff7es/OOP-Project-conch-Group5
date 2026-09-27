@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 interface FilterGroupProps {
   label: string
   options: string[]
