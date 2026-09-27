@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+
 interface FilterGroupProps {
   label: string
   options: string[]
@@ -17,7 +18,15 @@ export default function FilterGroup({
   const [highlightStyle, setHighlightStyle] = useState({ left: '0px', width: '0px' })
   const containerRef = useRef<HTMLDivElement>(null)
   const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({})
-  const pipSoundRef = useRef(new Audio(pipSound))
+  const pipSoundRef = useRef<HTMLAudioElement | null>(null)
+
+  // Initialize audio on mount
+  useEffect(() => {
+    // Try to load the pip sound - adjust the path if your file is named differently
+    const audio = new Audio('/sfx/pip.wav')
+    audio.preload = 'auto'
+    pipSoundRef.current = audio
+  }, [])
 
   const updateHighlight = () => {
     const selectedPill = pillRefs.current[selected]
@@ -43,8 +52,10 @@ export default function FilterGroup({
   }, [selected])
 
   const playSound = () => {
-    pipSoundRef.current.currentTime = 0
-    pipSoundRef.current.play().catch(() => {})
+    if (pipSoundRef.current) {
+      pipSoundRef.current.currentTime = 0
+      pipSoundRef.current.play().catch(() => {})
+    }
   }
 
   return (
