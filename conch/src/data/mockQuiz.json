@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "question": "Is TypeScript a superset of JavaScript?",
+    "choices": ["True", "False"],
+    "answer": "True"
+  },
+  {
+    "id": 2,
+    "question": "Which hook is used for side effects in React?",
+    "choices": ["useState", "useEffect", "useContext", "useReducer"],
+    "answer": "useEffect"
+  }
+]

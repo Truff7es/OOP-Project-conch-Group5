@@ -5,6 +5,7 @@ import HeroInput from './components/HeroInput'
 import QuestionCard from './components/QuestionCard'
 import lightModeSound from './assets/sfx/lightmodereal.wav'
 import darkModeSound from './assets/sfx/darkmodereal.wav'
+import { generateQuiz, type QuizQuestion } from './services/gemini'
 
 type Theme = 'light' | 'dark'
 
@@ -22,10 +23,52 @@ const getInitialTheme = (): Theme => {
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
+
   const [difficulty, setDifficulty] = useState('easy')
   const [mode, setMode] = useState('all')
-  const [questions, setQuestions] = useState('5')
-  const [selectedChoice, setSelectedChoice] = useState<string | null>(null)
+  const [questioncount, setQuestioncount] = useState('5')
+  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [topic, setTopic] = useState('')
+  const [answers, setAnswers] = useState<Record<number, string>>({})
+  
+  const handleSelectChoice = (choice: string) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [currentIndex]: choice,
+    }))
+  } 
+
+  const handleNext = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+    }
+  }
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1)
+    }
+  }
+
+  const handleGenerate = async () => {
+    try {
+      console.log("waiting for response");
+      setLoading(true);
+      const data = await generateQuiz(topic, 5, 'easy');
+      console.log(data)
+      setQuestions(data);
+      setAnswers({});
+      setCurrentIndex(0);
+    } catch(err){
+      console.error('Quiz generation failed: ', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const currentQuestion = questions[currentIndex];
 
   // Group audio instances into a single keyed ref map
   const soundsRef = useRef<Record<Theme, HTMLAudioElement> | null>(null)
@@ -73,7 +116,7 @@ export default function App() {
   }
 
   return (
-<body className="font-mono min-h-screen bg-lightmode-200 flex items-start justify-center pt-4.5 pb-8">
+<div className="font-mono min-h-screen bg-lightmode-200 flex items-start justify-center pt-4.5 pb-8">
   <div className="w-[70vw] max-w-300 min-h-[70vh]">
         <Navbar/>
 
@@ -98,26 +141,34 @@ export default function App() {
             label="questions"
             options={['5', '10', '20', 'custom']}
             icons={['', '', '', 'tune']}
-            selected={questions}
-            onSelect={setQuestions}
+            selected={questioncount}
+            onSelect={setQuestioncount}
           />
         </div>
         
         <div className="flex flex-col justify-center items-center min-h-[60vh]">
-          <QuestionCard
-            question="how many bf does jp have?"
-            choices={[
-              '1',
-              '2',
-              '10',
-              '999'
-            ]} // e.g. 2 choices, or ['A', 'B', 'C', 'D'] for 4
-            selectedChoice={selectedChoice}
-            onSelectChoice={setSelectedChoice}
-          />
-          <HeroInput />
+          {!loading && currentQuestion && (
+            <>
+              <QuestionCard
+                id={currentQuestion.id}
+                question={currentQuestion.question}
+                choices={currentQuestion.choices}
+                selectedChoice={answers[currentIndex]}
+                onSelectChoice={handleSelectChoice}
+                onNext={handleNext}
+                onPrev={handlePrev}
+              />
+          </>
+          )}
+          {!loading && !currentQuestion && (
+            <HeroInput
+              value={topic}
+              onChange={setTopic}
+              onSubmit={handleGenerate}
+              disabled={loading}
+            />)}
         </div>
       </div>
-    </body>
+    </div>
   )
 }

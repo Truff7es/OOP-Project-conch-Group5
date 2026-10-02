@@ -1,15 +1,21 @@
 interface QuestionCardProps {
-  question: string
-  choices: string[]
+    id: number
+    question: string
+    choices: string[]
     selectedChoice: string | null
-  onSelectChoice: (choice: string) => void
+    onSelectChoice: (choice: string) => void
+    onNext: () => void
+    onPrev: () => void
 }
 
 export default function QuestionCard({
-  question,
-  choices,
-  selectedChoice,
-  onSelectChoice,
+    id,
+    question,
+    choices,
+    selectedChoice,
+    onSelectChoice,
+    onNext,
+    onPrev,
 }: QuestionCardProps){
     
     
@@ -17,7 +23,7 @@ export default function QuestionCard({
         <div className="">
             <div className="mul-choice flex gap-4 flex-col bg-lightmode-200 w-225 p-6 rounded-2xl">
                 <div className="count text-l text-lightmode-500">
-                    Question ?
+                    Question {id}
                 </div>
                 <div className="question font-bold text-xl text-lightmode-600">
                     {question}
@@ -38,6 +44,12 @@ export default function QuestionCard({
                             </button>
                         )
                     })}
+                </div>
+                <div className="btns flex flex-row justify-end gap-3">
+                    <button className="btn w-26 h-10 bg-lightmode-100 text-lightmode-800 rounded-2xl cursor-pointer"
+                    onClick={onPrev}>Previous</button>
+                    <button className="btn w-26 h-10 bg-lightmode-400 text-lightmode-800 rounded-2xl cursor-pointer"
+                    onClick={onNext}>Next</button>
                 </div>
             </div>
         </div>

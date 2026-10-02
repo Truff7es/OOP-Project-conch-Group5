@@ -3,7 +3,19 @@ import type { ChangeEvent } from 'react'
 import typeSound from '../assets/sfx/type.wav'
 import typeBackSound from '../assets/sfx/typeback.wav'
 
-export default function HeroInput() {
+interface HeroInputProps{
+  value: string
+  onChange: (value: string) => void
+  onSubmit?: () => void
+  disabled?: boolean
+}
+
+export default function HeroInput({
+  value,
+  onChange,
+  onSubmit,
+  disabled,
+}: HeroInputProps) {
   const [topic, setTopic] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [deletedChars, setDeletedChars] = useState<Array<{ char: string; index: number; id: number }>>([])
@@ -33,41 +45,15 @@ export default function HeroInput() {
     setSelectedFile(file)
   }
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const newTopic = event.target.value
-    const oldLength = topic.length
-
-    if (newTopic.length < oldLength) {
-      const deletedCount = oldLength - newTopic.length
-      playSound(typeBackSoundRef.current)
-
-      const newDeletedChars: Array<{ char: string; index: number; id: number }> = []
-      for (let i = 0; i < deletedCount; i++) {
-        const deletedIndex = newTopic.length + i
-        newDeletedChars.push({
-          char: topic[deletedIndex],
-          index: deletedIndex,
-          id: Date.now() + Math.random(),
-        })
-      }
-
-      setDeletedChars((prev) => [...prev, ...newDeletedChars])
-
-      setTimeout(() => {
-        setDeletedChars((prev) =>
-          prev.filter((c) => !newDeletedChars.some((nc) => nc.id === c.id))
-        )
-      }, 400)
-    } else if (newTopic.length > oldLength) {
-      playSound(typeSoundRef.current)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && onSubmit) {
+      onSubmit()
     }
-
-    setTopic(newTopic)
   }
-
+  
   return (
     <section className="w-full max-w-175 flex flex-col items-center justify-center gap-5 pt-12">
-      <h1 className="m-0 text-[clamp(2rem,2vw+1.2rem,3rem)] leading-tight text-light-text dark:text-dark-text text-center font-mono">
+      <h1 className="leading-tight text-light-text dark:text-dark-text text-center font-mono">
         What's today's topic?
       </h1>
 
@@ -91,8 +77,10 @@ export default function HeroInput() {
         <div className="flex-1 relative overflow-hidden">
           <input
             type="text"
-            value={topic}
-            onChange={handleChange}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
             className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono transition-colors"
             placeholder={isFocused || topic ? '' : 'Type a topic...'}
             onFocus={() => setIsFocused(true)}
