@@ -67,11 +67,11 @@ export default function FilterGroup({
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        className="relative bg-light-bar dark:bg-dark-bar rounded-[18px] px-4 py-[0.35rem] flex items-center justify-center gap-[0.35rem] overflow-hidden"
+        className="relative rounded-full px-4 flex items-center justify-center gap-2 overflow-hidden bg-lightmode-400"
         ref={containerRef}
       >
         <div
-          className="absolute top-1/2 -translate-y-1/2 h-[70%] bg-white/25 rounded-full pointer-events-none z-0 transition-[left,width] duration-150 ease-out"
+          className="absolute top-1/2 -translate-y-1/2 h-[60%] bg-white opacity-30 rounded-full pointer-events-none duration-150 ease-in-out"
           style={highlightStyle}
         />
         {options.map((option, index) => (
@@ -79,19 +79,19 @@ export default function FilterGroup({
             key={option}
             ref={(el) => { pillRefs.current[option] = el }}
             type="button"
-            className="relative z-10 inline-flex items-center justify-center gap-1 border-none rounded-full bg-transparent px-3 py-[0.55rem] min-h-9 text-xs font-mono text-light-text/80 dark:text-dark-text/80 lowercase cursor-pointer transition-colors hover:opacity-50"
+            className="relative inline-flex items-center justify-center gap-1 rounded-full px-3 py-3 text-lightmode-600 text-xs font-mono cursor-pointer hover:opacity-80"
             onClick={() => {
               playSound()
               onSelect(option)
             }}
             aria-pressed={selected === option}
           >
-            {icons?.[index] && <span className="material-symbols-outlined text-[15px]">{icons[index]}</span>}
+            {icons?.[index] && <span className="material-symbols-outlined">{icons[index]}</span>}
             <span>{option}</span>
           </button>
         ))}
       </div>
-      <span className="bar-title text-s text-neutral-400 font-mono">
+      <span className="bar-title text-s text-lightmode-600 font-mono">
         {label}
       </span>
     </div>
