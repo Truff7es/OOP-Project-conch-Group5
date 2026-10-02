@@ -3,11 +3,13 @@ import Navbar from './components/Navbar'
 import FilterGroup from './components/FilterGroup'
 import HeroInput from './components/HeroInput'
 import QuestionCard from './components/QuestionCard'
+import LoadingCard from './components/LoadingCard'
 import lightModeSound from './assets/sfx/lightmodereal.wav'
 import darkModeSound from './assets/sfx/darkmodereal.wav'
 import { generateQuiz, type QuizQuestion } from './services/gemini'
 
 type Theme = 'light' | 'dark'
+type FetchPhase = 'idle' | 'fetching' | 'done' 
 
 const getInitialTheme = (): Theme => {
   if (typeof window === 'undefined') {
@@ -32,43 +34,88 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [topic, setTopic] = useState('')
   const [answers, setAnswers] = useState<Record<number, string>>({})
-  
+  const [fetchPhase, setFetchPhase] = useState<FetchPhase>('idle')
+  const [showQuestions, setShowQuestions] = useState(false)
+
+  const transitionTimers = useRef<number[]>([])
+
+  const clearTransitionTimers = () => {
+    transitionTimers.current.forEach((timer) => window.clearTimeout(timer))
+    transitionTimers.current = []
+  }
+
+  useEffect(() => {
+    return () => clearTransitionTimers()
+  }, [])
+
   const handleSelectChoice = (choice: string) => {
     setAnswers((prev) => ({
       ...prev,
       [currentIndex]: choice,
     }))
-  } 
+  }
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1)
+      setCurrentIndex((prev) => prev + 1)
     }
   }
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1)
+      setCurrentIndex((prev) => prev - 1)
     }
   }
 
-  const handleGenerate = async () => {
-    try {
-      console.log("waiting for response");
-      setLoading(true);
-      const data = await generateQuiz(topic, 5, 'easy');
-      console.log(data)
-      setQuestions(data);
-      setAnswers({});
-      setCurrentIndex(0);
-    } catch(err){
-      console.error('Quiz generation failed: ', err);
-    } finally {
-      setLoading(false);
-    }
-  }
+const handleGenerate = async () => {
+  clearTransitionTimers()
 
-  const currentQuestion = questions[currentIndex];
+  setLoading(true)
+  setShowQuestions(false)
+  setFetchPhase('fetching')
+
+  const fetchStart = performance.now()
+
+  try {
+    console.log('waiting for response')
+
+    const data = await generateQuiz(topic, 5, 'easy')
+
+    console.log(data)
+
+    setQuestions(data)
+    setAnswers({})
+    setCurrentIndex(0)
+
+    // Fetching must stay on screen for at least 5 seconds.
+    const elapsed = performance.now() - fetchStart
+    const remaining = Math.max(0, 5000 - elapsed)
+
+    const doneTimer = window.setTimeout(() => {
+      setFetchPhase('done')
+
+      // Give "Done!" a moment to be visible,
+      // then let LoadingCard's 1s fade-out finish.
+      const exitTimer = window.setTimeout(() => {
+        setShowQuestions(true)
+        setLoading(false)
+        setFetchPhase('idle')
+      }, 1000)
+
+      transitionTimers.current.push(exitTimer)
+    }, remaining)
+
+    transitionTimers.current.push(doneTimer)
+  } catch (err) {
+    console.error('Quiz generation failed: ', err)
+
+    setFetchPhase('idle')
+    setLoading(false)
+    setShowQuestions(false)
+  }
+}
+
+  const currentQuestion = questions[currentIndex]
 
   const soundsRef = useRef<Record<Theme, HTMLAudioElement> | null>(null)
 
@@ -99,9 +146,11 @@ export default function App() {
 
   const playThemeSound = (targetTheme: Theme) => {
     const audio = soundsRef.current?.[targetTheme]
+
     if (!audio) return
 
     audio.currentTime = 0
+
     audio.play().catch((error) => {
       console.warn('Audio playback prevented:', error)
     })
@@ -109,6 +158,7 @@ export default function App() {
 
   const toggleTheme = () => {
     const nextTheme: Theme = theme === 'light' ? 'dark' : 'light'
+
     setTheme(nextTheme)
     playThemeSound(nextTheme)
   }
@@ -116,7 +166,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-4.5 pb-8 font-mono">
       <div className="w-[70vw] max-w-300 min-h-[70vh]">
-        <Navbar theme={theme} onToggleTheme={toggleTheme} />
+        <Navbar
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
 
         <div className="flex justify-center gap-8 flex-wrap">
           <FilterGroup
@@ -143,9 +196,14 @@ export default function App() {
             onSelect={setQuestioncount}
           />
         </div>
+
         <div className="flex flex-col justify-center items-center min-h-[60vh]">
-          {!loading && currentQuestion && (
-            <>
+          {fetchPhase !== 'idle' && !showQuestions && (
+            <LoadingCard status={fetchPhase} />
+          )}
+
+          {showQuestions && currentQuestion && (
+            <div className="w-full flex justify-center question-reveal">
               <QuestionCard
                 id={currentQuestion.id}
                 question={currentQuestion.question}
@@ -154,16 +212,23 @@ export default function App() {
                 onSelectChoice={handleSelectChoice}
                 onNext={handleNext}
                 onPrev={handlePrev}
+                isFirstQuestion={currentIndex === 0}
+                isLastQuestion={currentIndex === questions.length - 1}
               />
-          </>
+            </div>
           )}
-          {!loading && !currentQuestion && (
-            <HeroInput
-              value={topic}
-              onChange={setTopic}
-              onSubmit={handleGenerate}
-              disabled={loading}
-            />)}
+
+          {!loading &&
+            fetchPhase === 'idle' &&
+            !showQuestions &&
+            !currentQuestion && (
+              <HeroInput
+                value={topic}
+                onChange={setTopic}
+                onSubmit={handleGenerate}
+                disabled={loading}
+              />
+            )}
         </div>
       </div>
     </div>
