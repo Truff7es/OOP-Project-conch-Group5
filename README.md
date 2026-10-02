@@ -5,7 +5,7 @@ Conch is a web-based application that turns source documents into ready-to-use, 
 ## Features
 
 - **Document-to-quiz generation** — upload PDFs, slides, and text files to automatically generate quizzes based on the source material.
-- **Context-aware questions** — use GPT-5.6 Luna to interpret uploaded documents and generate questions grounded in their content.
+- **Context-aware questions** — use Gemini 3.5 Flash-Lite to interpret uploaded documents and generate questions grounded in their content.
 - **Interactive quiz editor** — fine-tune generated questions, answer choices, and difficulty levels before sharing.
 - **Quiz sharing** — share completed quizzes directly with other users through links.
 - **Study exports** — export completed quizzes into ready-to-use study formats.
