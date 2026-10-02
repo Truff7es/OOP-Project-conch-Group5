@@ -1,15 +1,34 @@
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
 @import "tailwindcss";
 
 @theme {
-  --color-lightmode-50: oklch(98.5% 0 0);
-  --color-lightmode-100: oklch(96.5% 0.003 245.891);
-  --color-lightmode-200: oklch(91.6% 0.012 245.836);
-  --color-lightmode-300: oklch(86.5% 0.021 245.802);
-  --color-lightmode-400: oklch(75.7% 0.045 245.583);
-  --color-lightmode-500: oklch(54.2% 0.048 245.454);
-  --color-lightmode-600: oklch(42.9% 0.051 245.302);
-  --color-lightmode-700: oklch(35.5% 0.039 245.321);
-  --color-lightmode-800: oklch(25.7% 0.018 245.549);
-  --color-lightmode-900: oklch(19.1% 0.019 245.401);
-  --color-lightmode-950: oklch(14.1% 0.015 245.339);
+  --font-mono: "JetBrains Mono", monospace;
+  --color-light-bg: #f9fbfd;
+  --color-light-bar: #b3cbdf;
+  --color-light-text: #3d6073;
+  --color-dark-bg: #0d151c;
+  --color-dark-bar: #233443;
+  --color-dark-text: #8fb2cb;
+
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes charDrop {
+  0% {
+    transform: translateY(-50%) rotateZ(0deg) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100px) rotateZ(0deg) translateX(var(--random-x-offset));
+    opacity: 0;
+  }
+}
+
+@keyframes charFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
