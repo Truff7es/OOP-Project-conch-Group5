@@ -1,9 +1,10 @@
 import { useRef, useState, useLayoutEffect } from 'react'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, KeyboardEvent } from 'react'
+
 import typeSound from '../assets/sfx/type.wav'
 import typeBackSound from '../assets/sfx/typeback.wav'
 
-interface HeroInputProps{
+interface HeroInputProps {
   value: string
   onChange: (value: string) => void
   onSubmit?: () => void
@@ -16,25 +17,38 @@ export default function HeroInput({
   onSubmit,
   disabled,
 }: HeroInputProps) {
-  const [topic, setTopic] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [deletedChars, setDeletedChars] = useState<Array<{ char: string; index: number; id: number }>>([])
+
+  const [deletedChars, setDeletedChars] = useState<
+    Array<{ char: string; index: number; id: number }>
+  >([])
+
   const [isFocused, setIsFocused] = useState(false)
+
   const typeSoundRef = useRef<HTMLAudioElement | null>(null)
   const typeBackSoundRef = useRef<HTMLAudioElement | null>(null)
 
   useLayoutEffect(() => {
     const typeAudio = new Audio(typeSound)
     const typeBackAudio = new Audio(typeBackSound)
+
     typeAudio.preload = 'auto'
     typeBackAudio.preload = 'auto'
+
     typeSoundRef.current = typeAudio
     typeBackSoundRef.current = typeBackAudio
+
+    return () => {
+      typeAudio.pause()
+      typeBackAudio.pause()
+    }
   }, [])
 
   const playSound = (audio: HTMLAudioElement | null) => {
     if (!audio) return
+
     audio.currentTime = 0
+
     audio.play().catch((error) => {
       console.warn('Audio playback prevented:', error)
     })
@@ -45,15 +59,59 @@ export default function HeroInput({
     setSelectedFile(file)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && onSubmit) {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value
+    const oldValue = value
+
+    if (newValue.length < oldValue.length) {
+      const deletedCount = oldValue.length - newValue.length
+
+      playSound(typeBackSoundRef.current)
+
+      const newDeletedChars: Array<{
+        char: string
+        index: number
+        id: number
+      }> = []
+
+      for (let i = 0; i < deletedCount; i++) {
+        const deletedIndex = newValue.length + i
+
+        newDeletedChars.push({
+          char: oldValue[deletedIndex],
+          index: deletedIndex,
+          id: Date.now() + Math.random(),
+        })
+      }
+
+      setDeletedChars((prev) => [...prev, ...newDeletedChars])
+
+      setTimeout(() => {
+        setDeletedChars((prev) =>
+          prev.filter(
+            (char) =>
+              !newDeletedChars.some(
+                (newChar) => newChar.id === char.id
+              )
+          )
+        )
+      }, 400)
+    } else if (newValue.length > oldValue.length) {
+      playSound(typeSoundRef.current)
+    }
+
+    onChange(newValue)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && onSubmit && !disabled) {
       onSubmit()
     }
   }
-  
+
   return (
     <section className="w-full max-w-175 flex flex-col items-center justify-center gap-5 pt-12">
-      <h1 className="leading-tight text-light-text dark:text-dark-text text-center font-mono">
+      <h1 className="m-0 text-[clamp(2rem,2vw+1.2rem,3rem)] leading-tight text-light-text dark:text-dark-text text-center font-mono">
         What's today's topic?
       </h1>
 
@@ -78,26 +136,30 @@ export default function HeroInput({
           <input
             type="text"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={disabled}
             className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono transition-colors"
-            placeholder={isFocused || topic ? '' : 'Type a topic...'}
+            placeholder={isFocused || value ? '' : 'Type a topic...'}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             spellCheck="false"
           />
+
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
             {deletedChars.map((item) => (
               <div
                 key={item.id}
                 className="absolute top-1/2 left-0 text-lg leading-[1.4] px-1 py-2 whitespace-nowrap text-light-text dark:text-dark-text font-mono"
-                style={{
-                  '--char-index': item.index,
-                  '--random-x-offset': (Math.random() - 0.5) * 8,
-                  animation: 'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
-                  marginLeft: `calc(var(--char-index) * 0.6em)`,
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--char-index': item.index,
+                    '--random-x-offset': (Math.random() - 0.5) * 8,
+                    animation:
+                      'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
+                    marginLeft: `calc(var(--char-index) * 0.6em)`,
+                  } as React.CSSProperties
+                }
               >
                 {item.char}
               </div>
