@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Navbar from './components/Navbar'
 import FilterGroup from './components/FilterGroup'
 import HeroInput from './components/HeroInput'
@@ -70,7 +70,6 @@ export default function App() {
 
   const currentQuestion = questions[currentIndex];
 
-  // Group audio instances into a single keyed ref map
   const soundsRef = useRef<Record<Theme, HTMLAudioElement> | null>(null)
 
   useEffect(() => {
@@ -91,7 +90,6 @@ export default function App() {
 
     soundsRef.current = audioMap
 
-    // Cleanup: pause audio on unmount to prevent leaks or orphaned playback
     return () => {
       if (soundsRef.current) {
         Object.values(soundsRef.current).forEach((audio) => audio.pause())
@@ -116,9 +114,9 @@ export default function App() {
   }
 
   return (
-<div className="font-mono min-h-screen bg-lightmode-200 flex items-start justify-center pt-4.5 pb-8">
-  <div className="w-[70vw] max-w-300 min-h-[70vh]">
-        <Navbar/>
+    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-4.5 pb-8 font-mono">
+      <div className="w-[70vw] max-w-300 min-h-[70vh]">
+        <Navbar theme={theme} onToggleTheme={toggleTheme} />
 
         <div className="flex justify-center gap-8 flex-wrap">
           <FilterGroup
@@ -131,8 +129,8 @@ export default function App() {
 
           <FilterGroup
             label="mode"
-            options={['all', 'mc', 'true/false', 'checkbox','fill-in']}
-            icons={['apps', 'list_alt', 'flaky', 'check_box','keyboard']}
+            options={['all', 'mc', 'true/false', 'checkbox', 'fill-in']}
+            icons={['apps', 'list_alt', 'flaky', 'check_box', 'keyboard']}
             selected={mode}
             onSelect={setMode}
           />
@@ -145,7 +143,6 @@ export default function App() {
             onSelect={setQuestioncount}
           />
         </div>
-        
         <div className="flex flex-col justify-center items-center min-h-[60vh]">
           {!loading && currentQuestion && (
             <>
