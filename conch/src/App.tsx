@@ -79,7 +79,7 @@ const handleGenerate = async () => {
   try {
     console.log('waiting for response')
 
-    const data = await generateQuiz(topic, 5, 'easy')
+    const data = await generateQuiz(topic, mode, 5, 'hard')
 
     console.log(data)
 
@@ -165,7 +165,7 @@ const handleGenerate = async () => {
 
   return (
     <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-4.5 pb-8 font-mono">
-      <div className="w-[70vw] max-w-300 min-h-[70vh]">
+      <div className="flex flex-col gap-4 w-[70vw] max-w-300 min-h-[70vh]">
         <Navbar
           theme={theme}
           onToggleTheme={toggleTheme}

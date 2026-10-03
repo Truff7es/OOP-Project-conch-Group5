@@ -22,8 +22,8 @@ export default function QuestionCard({
   isLastQuestion,
 }: QuestionCardProps) {
   return (
-    <div className="w-full max-w-2xl">
-      <div className="flex gap-4 flex-col bg-light-bar dark:bg-dark-bar p-6 rounded-2xl transition-colors">
+    <div className="w-full max-w-4xl">
+      <div className="flex gap-6 flex-col p-6 rounded-2xl transition-colors">
         <div className="text-sm font-mono text-light-text/70 dark:text-dark-text/70">
           Question {id}
         </div>
@@ -41,10 +41,11 @@ export default function QuestionCard({
                 key={choice}
                 type="button"
                 onClick={() => onSelectChoice(choice)}
-                className="flex items-center gap-3 p-4 w-full rounded-2xl bg-light-bg dark:bg-dark-bg cursor-pointer text-left transition-colors text-light-text dark:text-dark-text hover:opacity-90"
+                className={`flex items-center gap-3 p-4 w-full rounded-2xl  cursor-pointer text-left transition-all text-light-text dark:text-dark-text duration-200 hover:opacity-90
+                  ${isSelected ? ` bg-light-bar/75 dark:bg-dark-bar/75`: `` }`}
               >
                 <div
-                  className={`flex justify-center w-5 h-5 shrink-0 rounded-full border-2 border-light-text dark:border-dark-text transition-all ${
+                  className={`flex justify-center w-5 h-5 shrink-0 rounded-full border-2  transition-all ${
                     isSelected ? 'bg-light-text dark:bg-dark-text' : ''
                   }`}
                 />
