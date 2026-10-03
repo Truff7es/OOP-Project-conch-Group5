@@ -2,17 +2,59 @@
 @import '@fontsource/jetbrains-mono/500.css';
 @import '@fontsource/jetbrains-mono/700.css';
 
+
 @import "tailwindcss";
 
 @theme {
   --font-mono: "JetBrains Mono", monospace;
+
   --color-light-bg: #f9fbfd;
   --color-light-bar: #b3cbdf;
   --color-light-text: #3d6073;
+
   --color-dark-bg: #0d151c;
   --color-dark-bar: #233443;
   --color-dark-text: #8fb2cb;
 
+  --animate-question-reveal: questionReveal 0.35s ease-out;
+  --animate-confirmation-pop: confirmationPop 0.2s ease-out;
+  --animate-results-hero: resultsHero 0.45s ease-out;
+
+  @keyframes questionReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes confirmationPop {
+    0% {
+      opacity: 0;
+      transform: translateY(12px) scale(0.94);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes resultsHero {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
