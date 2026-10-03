@@ -7,7 +7,7 @@ export default function Navbar({ theme, onToggleTheme }: NavbarProps) {
   const showLightIcon = theme === 'light'
 
   return (
-    <header className="flex items-center justify-between pb-4 pt-2">
+    <header className="flex items-center justify-between">
       <div className="text-5xl font-mono font-bold tracking-tighter text-light-text dark:text-dark-text">
         conch
       </div>
