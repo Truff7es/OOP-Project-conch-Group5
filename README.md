@@ -39,5 +39,5 @@ Ensure you have the following installed locally:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Truff7es/OOP-Project-conch-Group5.git
+   git clone https://github.com/qhip-qhop/OOP-Project-conch-Group5.git
    cd OOP-Project-conch-Group5/conch
