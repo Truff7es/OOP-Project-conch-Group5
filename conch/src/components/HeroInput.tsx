@@ -150,7 +150,9 @@ export default function HeroInput({
     onChange(newValue)
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault()
 
     if (disabled) return
@@ -198,7 +200,7 @@ export default function HeroInput({
           <input
             type="file"
             id="file-attachment"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             multiple
             hidden
             onChange={handleFileChange}
@@ -207,7 +209,7 @@ export default function HeroInput({
           <label
             htmlFor="file-attachment"
             className="shrink-0 w-10 h-10 rounded-full bg-transparent text-light-text dark:text-dark-text text-2xl grid place-items-center cursor-pointer select-none transition-opacity hover:opacity-70"
-            title="Attach PDF or DOCX"
+            title="Attach TXT, PDF, or DOCX"
           >
             ＋
           </label>
