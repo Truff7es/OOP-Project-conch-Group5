@@ -1,7 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import * as pdfjsLib from 'pdfjs-dist'
 import mammoth from 'mammoth'
-
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
@@ -29,14 +28,12 @@ async function readFile(file: File): Promise<string> {
     file.type === 'text/plain' ||
     file.name.toLowerCase().endsWith('.txt')
   ) {
-    return await file.text()
+    return file.text()
   }
 
   if (file.type === 'application/pdf') {
-    const buffer = await file.arrayBuffer()
-
     const pdf = await pdfjsLib.getDocument({
-      data: new Uint8Array(buffer),
+      data: new Uint8Array(await file.arrayBuffer()),
     }).promise
 
     let text = ''
@@ -59,10 +56,8 @@ async function readFile(file: File): Promise<string> {
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
     file.name.toLowerCase().endsWith('.docx')
   ) {
-    const buffer = await file.arrayBuffer()
-
     const result = await mammoth.extractRawText({
-      arrayBuffer: buffer,
+      arrayBuffer: await file.arrayBuffer(),
     })
 
     return result.value
@@ -88,47 +83,44 @@ ${await readFile(file)}
 `
   }
 
+  const types: QuestionType[] = [
+    'mc',
+    'true/false',
+    'checkbox',
+    'fill-in',
+  ]
+
   let modeRules = ''
 
   if (mode === 'all') {
-    modeRules = `
-- Mix MC, true/false, checkbox, and fill-in questions.
-- Use all four types when possible.
-- Each question must have its own correct type.
-`
-  }
+    const assignedTypes = Array.from(
+      { length: count },
+      () => types[Math.floor(Math.random() * types.length)]
+    )
 
-  if (mode === 'mc') {
     modeRules = `
-- Every question must have type "mc".
-- Every question has exactly 4 choices.
-- Every question has exactly 1 correct answer.
-`
-  }
+- Use the assigned type for each question.
+${assignedTypes
+  .map((type, i) => `- Question ${i + 1}: ${type}`)
+  .join('\n')}
 
-  if (mode === 'true/false') {
-    modeRules = `
-- Every question must have type "true/false".
-- Every question has exactly 2 choices: "True" and "False".
-- Every question has exactly 1 correct answer.
+- mc: exactly 4 choices and 1 correct answer.
+- true/false: choices must be "True" and "False", with 1 correct answer.
+- checkbox: exactly 4 choices, at least 2 correct answers, separated by |.
+- fill-in: choices must be [].
 `
-  }
+  } else {
+    const rules: Record<string, string> = {
+      mc: 'type "mc", 4 choices, 1 correct answer.',
+      'true/false':
+        'type "true/false", choices "True" and "False", 1 correct answer.',
+      checkbox:
+        'type "checkbox", 4 choices, at least 2 correct answers separated by |.',
+      'fill-in':
+        'type "fill-in", with an empty choices array.',
+    }
 
-  if (mode === 'checkbox') {
-    modeRules = `
-- Every question must have type "checkbox".
-- Every question has exactly 4 choices.
-- Every question has at least 2 correct answers.
-- Separate multiple correct answers with |.
-`
-  }
-
-  if (mode === 'fill-in') {
-    modeRules = `
-- Every question must have type "fill-in".
-- Every question must have an empty choices array.
-- The answer is the expected written answer.
-`
+    modeRules = `- Every question must have ${rules[mode]}`
   }
 
   const prompt = `
@@ -154,7 +146,7 @@ Rules:
 - Do not invent information from the documents.
 ${modeRules}
 
-Return JSON only.
+Return JSON only:
 
 [
   {
@@ -175,13 +167,11 @@ Return JSON only.
     },
   })
 
-  const text = response.text
-
-  if (!text) {
+  if (!response.text) {
     throw new Error('Gemini returned an empty response.')
   }
 
-  const result = JSON.parse(text) as QuizQuestion[]
+  const result = JSON.parse(response.text) as QuizQuestion[]
 
   if (result.length !== count) {
     throw new Error(

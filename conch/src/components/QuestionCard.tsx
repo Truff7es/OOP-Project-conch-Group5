@@ -1,4 +1,9 @@
+import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { QuestionType } from '../services/gemini'
+
+import typeSound from '../assets/sfx/type.wav'
+import typeBackSound from '../assets/sfx/typeback.wav'
 
 interface QuestionCardProps {
   id: number
@@ -13,7 +18,7 @@ interface QuestionCardProps {
   isLastQuestion: boolean
 }
 
-const typeLabels: Record<QuestionType, string> = {
+const typeNames: Record<QuestionType, string> = {
   mc: 'Multiple Choice',
   'true/false': 'True or False',
   checkbox: 'Checkbox',
@@ -25,14 +30,65 @@ export default function QuestionCard({
   type,
   question,
   choices,
-  selectedChoice,
+  selectedChoice = '',
   onSelectChoice,
   onNext,
   onPrev,
   isFirstQuestion,
   isLastQuestion,
 }: QuestionCardProps) {
-  const selected = selectedChoice?.split('|') ?? []
+  const [isFocused, setIsFocused] = useState(false)
+  const [deletedChars, setDeletedChars] = useState<
+    { char: string; index: number; id: number }[]
+  >([])
+
+  const typeAudio = useRef<HTMLAudioElement | null>(null)
+  const backAudio = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    typeAudio.current = new Audio(typeSound)
+    backAudio.current = new Audio(typeBackSound)
+  }, [])
+
+  const playSound = (audio: HTMLAudioElement | null) => {
+    if (!audio) return
+    audio.currentTime = 0
+    audio.play().catch(() => {})
+  }
+
+  const handleFillChange = (value: string) => {
+    if (value.length < selectedChoice.length) {
+      playSound(backAudio.current)
+
+      const deleted = Array.from(
+        { length: selectedChoice.length - value.length },
+        (_, i) => ({
+          char: selectedChoice[value.length + i],
+          index: value.length + i,
+          id: Date.now() + Math.random(),
+        })
+      )
+
+      setDeletedChars((prev) => [...prev, ...deleted])
+
+      setTimeout(() => {
+        setDeletedChars((prev) =>
+          prev.filter(
+            (item) =>
+              !deleted.some(
+                (char) => char.id === item.id
+              )
+          )
+        )
+      }, 400)
+    } else if (value.length > selectedChoice.length) {
+      playSound(typeAudio.current)
+    }
+
+    onSelectChoice(value)
+  }
+
+  const selected = selectedChoice.split('|')
 
   const toggleChoice = (choice: string) => {
     onSelectChoice(
@@ -46,21 +102,50 @@ export default function QuestionCard({
     <div className="w-full max-w-2xl">
       <div className="flex flex-col gap-4 bg-light-bar dark:bg-dark-bar p-6 rounded-2xl transition-colors">
         <div className="text-sm text-light-text/70 dark:text-dark-text/70">
-          Question {id} - {typeLabels[type]}
+          Question {id} - {typeNames[type]}
         </div>
 
-        <div className="font-bold text-xl text-light-text dark:text-dark-text">
+        <div className="font-bold text-xl text-light-text dark:text-dark-text selection:bg-light-text selection:text-light-bg dark:selection:bg-dark-text dark:selection:text-dark-bg">
           {question}
         </div>
 
         {type === 'fill-in' ? (
-          <input
-            type="text"
-            value={selectedChoice ?? ''}
-            onChange={(e) => onSelectChoice(e.target.value)}
-            placeholder="Type your answer..."
-            className="w-full p-4 rounded-2xl bg-light-bg dark:bg-dark-bg outline-none text-light-text dark:text-dark-text font-mono"
-          />
+          <div className="relative overflow-hidden">
+            <input
+              type="text"
+              value={selectedChoice}
+              onChange={(e) => handleFillChange(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={
+                isFocused || selectedChoice
+                  ? ''
+                  : 'Type your answer...'
+              }
+              spellCheck="false"
+              className="relative z-10 w-full p-4 rounded-2xl bg-light-bg dark:bg-dark-bg outline-none text-light-text dark:text-dark-text font-mono selection:bg-light-text selection:text-light-bg dark:selection:bg-dark-text dark:selection:text-dark-bg"
+            />
+
+            <div className="absolute inset-0 pointer-events-none z-20">
+              {deletedChars.map((item) => (
+                <div
+                  key={item.id}
+                  className="absolute top-1/2 left-0 text-base leading-[1.4] px-4 py-4 whitespace-nowrap text-light-text dark:text-dark-text font-mono"
+                  style={
+                    {
+                      '--char-index': item.index,
+                      '--random-x-offset': (Math.random() - 0.5) * 8,
+                      animation:
+                        'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
+                      marginLeft: 'calc(var(--char-index) * 0.6em)',
+                    } as CSSProperties
+                  }
+                >
+                  {item.char}
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col gap-3">
             {choices.map((choice) => {
@@ -75,15 +160,19 @@ export default function QuestionCard({
                       ? toggleChoice(choice)
                       : onSelectChoice(choice)
                   }
-                  className={`flex items-center gap-3 p-4 w-full rounded-2xl bg-light-bg dark:bg-dark-bg text-left text-light-text dark:text-dark-text transition-opacity ${
+                  className={`flex items-center gap-3 p-4 w-full rounded-2xl bg-light-bg dark:bg-dark-bg text-left text-light-text dark:text-dark-text transition-opacity selection:bg-light-text selection:text-light-bg dark:selection:bg-dark-text dark:selection:text-dark-bg ${
                     isSelected ? '' : 'hover:opacity-90'
                   }`}
                 >
                   <div
                     className={`w-5 h-5 shrink-0 border-2 border-light-text dark:border-dark-text ${
-                      type === 'checkbox' ? 'rounded-md' : 'rounded-full'
+                      type === 'checkbox'
+                        ? 'rounded-md'
+                        : 'rounded-full'
                     } ${
-                      isSelected ? 'bg-light-text dark:bg-dark-text' : ''
+                      isSelected
+                        ? 'bg-light-text dark:bg-dark-text'
+                        : ''
                     }`}
                   />
 
