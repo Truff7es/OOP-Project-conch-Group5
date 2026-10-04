@@ -1,5 +1,5 @@
-import { useRef, useState, useLayoutEffect } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent, CSSProperties } from 'react'
 
 import typeSound from '../assets/sfx/type.wav'
 import typeBackSound from '../assets/sfx/typeback.wav'
@@ -22,129 +22,85 @@ export default function HeroInput({
   onFilesChange,
 }: HeroInputProps) {
   const [deletedChars, setDeletedChars] = useState<
-    Array<{
-      char: string
-      index: number
-      id: number
-    }>
+    { char: string; index: number; id: number }[]
   >([])
-
   const [isFocused, setIsFocused] = useState(false)
 
-  const typeSoundRef =
-    useRef<HTMLAudioElement | null>(null)
-
-  const typeBackSoundRef =
-    useRef<HTMLAudioElement | null>(null)
+  const typeAudio = useRef<HTMLAudioElement | null>(null)
+  const backAudio = useRef<HTMLAudioElement | null>(null)
 
   useLayoutEffect(() => {
-    const typeAudio = new Audio(typeSound)
-    const typeBackAudio = new Audio(typeBackSound)
+    const type = new Audio(typeSound)
+    const back = new Audio(typeBackSound)
 
-    typeAudio.preload = 'auto'
-    typeBackAudio.preload = 'auto'
+    type.preload = 'auto'
+    back.preload = 'auto'
 
-    typeSoundRef.current = typeAudio
-    typeBackSoundRef.current = typeBackAudio
+    typeAudio.current = type
+    backAudio.current = back
 
     return () => {
-      typeAudio.pause()
-      typeBackAudio.pause()
+      type.pause()
+      back.pause()
     }
   }, [])
 
-  const playSound = (
-    audio: HTMLAudioElement | null
-  ) => {
+  const playSound = (audio: HTMLAudioElement | null) => {
     if (!audio) return
-
     audio.currentTime = 0
-
-    audio.play().catch((error) => {
-      console.warn(
-        'Audio playback prevented:',
-        error
-      )
-    })
+    audio.play().catch(() => {})
   }
 
-  const handleFileChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const selectedFiles = Array.from(
-      event.target.files ?? []
-    )
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(event.target.files ?? [])
+    if (!selected.length) return
 
-    if (selectedFiles.length === 0) return
-
-    const newFiles = selectedFiles.filter(
+    const newFiles = selected.filter(
       (file) =>
         !files.some(
-          (existingFile) =>
-            existingFile.name === file.name &&
-            existingFile.size === file.size
+          (old) =>
+            old.name === file.name &&
+            old.size === file.size
         )
     )
 
     onFilesChange([...files, ...newFiles])
-
     event.target.value = ''
   }
 
   const removeFile = (index: number) => {
-    onFilesChange(
-      files.filter((_, fileIndex) => fileIndex !== index)
-    )
+    onFilesChange(files.filter((_, i) => i !== index))
   }
 
-  const handleChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
-    const oldValue = value
 
-    if (newValue.length < oldValue.length) {
-      const deletedCount =
-        oldValue.length - newValue.length
+    if (newValue.length < value.length) {
+      playSound(backAudio.current)
 
-      playSound(typeBackSoundRef.current)
-
-      const newDeletedChars: Array<{
-        char: string
-        index: number
-        id: number
-      }> = []
-
-      for (let i = 0; i < deletedCount; i++) {
-        const deletedIndex = newValue.length + i
-
-        newDeletedChars.push({
-          char: oldValue[deletedIndex],
-          index: deletedIndex,
+      const deleted = Array.from(
+        { length: value.length - newValue.length },
+        (_, i) => ({
+          char: value[newValue.length + i],
+          index: newValue.length + i,
           id: Date.now() + Math.random(),
         })
-      }
+      )
 
-      setDeletedChars((prev) => [
-        ...prev,
-        ...newDeletedChars,
-      ])
+      setDeletedChars((prev) => [...prev, ...deleted])
 
       setTimeout(() => {
         setDeletedChars((prev) =>
           prev.filter(
-            (char) =>
-              !newDeletedChars.some(
-                (newChar) =>
-                  newChar.id === char.id
+            (item) =>
+              !deleted.some(
+                (char) => char.id === item.id
               )
           )
         )
       }, 400)
-    } else if (
-      newValue.length > oldValue.length
-    ) {
-      playSound(typeSoundRef.current)
+    } else if (newValue.length > value.length) {
+      playSound(typeAudio.current)
     }
 
     onChange(newValue)
@@ -152,12 +108,7 @@ export default function HeroInput({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
-    if (disabled) return
-
-    if (!onSubmit) return
-
-    onSubmit()
+    if (!disabled && onSubmit) onSubmit()
   }
 
   return (
@@ -190,15 +141,12 @@ export default function HeroInput({
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="w-full"
-      >
+      <form onSubmit={handleSubmit} className="w-full">
         <div className="w-full flex items-center gap-3 border border-light-text/35 dark:border-dark-text/35 rounded-full bg-light-bar dark:bg-dark-bar p-[0.6rem_0.9rem_0.6rem_0.5rem] transition-colors">
           <input
             type="file"
             id="file-attachment"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             multiple
             hidden
             onChange={handleFileChange}
@@ -207,7 +155,7 @@ export default function HeroInput({
           <label
             htmlFor="file-attachment"
             className="shrink-0 w-10 h-10 rounded-full bg-transparent text-light-text dark:text-dark-text text-2xl grid place-items-center cursor-pointer select-none transition-opacity hover:opacity-70"
-            title="Attach PDF or DOCX"
+            title="Attach TXT, PDF, or DOCX"
           >
             ＋
           </label>
@@ -218,18 +166,14 @@ export default function HeroInput({
               value={value}
               onChange={handleChange}
               disabled={disabled}
-              className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono transition-colors"
-              placeholder={
-                isFocused || value
-                  ? ''
-                  : 'Type a topic...'
-              }
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
+              placeholder={isFocused || value ? '' : 'Type a topic...'}
               spellCheck="false"
+              className="w-full border-none bg-transparent text-light-text dark:text-dark-text text-lg leading-[1.4] px-1 py-2 outline-none font-mono transition-colors selection:bg-light-text selection:text-light-bg dark:selection:bg-dark-text dark:selection:text-dark-bg"
             />
 
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+            <div className="absolute inset-0 pointer-events-none z-0">
               {deletedChars.map((item) => (
                 <div
                   key={item.id}
@@ -237,13 +181,11 @@ export default function HeroInput({
                   style={
                     {
                       '--char-index': item.index,
-                      '--random-x-offset':
-                        (Math.random() - 0.5) * 8,
+                      '--random-x-offset': (Math.random() - 0.5) * 8,
                       animation:
                         'charDrop 0.4s linear forwards, charFade 0.1s ease-in forwards 0.05s',
-                      marginLeft:
-                        'calc(var(--char-index) * 0.6em)',
-                    } as React.CSSProperties
+                      marginLeft: 'calc(var(--char-index) * 0.6em)',
+                    } as CSSProperties
                   }
                 >
                   {item.char}
@@ -256,3 +198,4 @@ export default function HeroInput({
     </section>
   )
 }
+
