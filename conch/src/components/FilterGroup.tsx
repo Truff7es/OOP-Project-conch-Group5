@@ -28,17 +28,16 @@ export default function FilterGroup({
   const containerRef = useRef<HTMLDivElement>(null)
   const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
+  const isCustomSelected = custom || !options.includes(selected)
+
   const updateHighlight = () => {
-    const selectedPill =
-      pillRefs.current[custom ? 'custom' : selected]
+    const activeKey = isCustomSelected ? 'custom' : selected
+    const selectedPill = pillRefs.current[activeKey]
     const container = containerRef.current
 
     if (selectedPill && container) {
-      const containerLeft =
-        container.getBoundingClientRect().left
-
-      const { left, width } =
-        selectedPill.getBoundingClientRect()
+      const containerLeft = container.getBoundingClientRect().left
+      const { left, width } = selectedPill.getBoundingClientRect()
 
       setHighlightStyle({
         left: `${left - containerLeft}px`,
@@ -48,15 +47,12 @@ export default function FilterGroup({
   }
 
   useEffect(() => {
-    document.fonts.ready?.then(() =>
-      requestAnimationFrame(updateHighlight)
-    )
+    document.fonts.ready?.then(() => requestAnimationFrame(updateHighlight))
   }, [selected, custom])
 
   useEffect(() => {
     window.addEventListener('resize', updateHighlight)
-    return () =>
-      window.removeEventListener('resize', updateHighlight)
+    return () => window.removeEventListener('resize', updateHighlight)
   }, [selected, custom])
 
   const playSound = () => {
@@ -70,6 +66,7 @@ export default function FilterGroup({
 
     if (option === 'custom') {
       setCustom(true)
+      onSelect('')
       return
     }
 
@@ -77,12 +74,9 @@ export default function FilterGroup({
     onSelect(option)
   }
 
-  const handleCustomChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCustomChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-
-    if (/^\d*$/.test(value) && value !== '') {
+    if (/^\d*$/.test(value)) {
       onSelect(value)
     }
   }
@@ -100,9 +94,7 @@ export default function FilterGroup({
 
         {options.map((option, index) => {
           const selectedNow =
-            custom
-              ? option === 'custom'
-              : selected === option
+            option === 'custom' ? isCustomSelected : !isCustomSelected && selected === option
 
           return (
             <button
@@ -124,11 +116,12 @@ export default function FilterGroup({
                 </span>
               )}
 
-              {option === 'custom' && custom ? (
+              {option === 'custom' && isCustomSelected ? (
                 <input
                   autoFocus
                   type="text"
                   inputMode="numeric"
+                  value={selected}
                   onChange={handleCustomChange}
                   className="w-8 bg-transparent text-center outline-none font-mono"
                 />
@@ -139,7 +132,6 @@ export default function FilterGroup({
           )
         })}
       </div>
-
       <span className="bar-title text-xs text-light-text/60 dark:text-dark-text/60 font-mono tracking-wider">
         {label}
       </span>
