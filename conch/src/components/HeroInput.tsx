@@ -117,30 +117,6 @@ export default function HeroInput({
         What's today's topic?
       </h1>
 
-      {files.length > 0 && (
-        <div className="w-full flex flex-wrap gap-2">
-          {files.map((file, index) => (
-            <div
-              key={`${file.name}-${file.size}`}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-light-bar dark:bg-dark-bar text-light-text dark:text-dark-text text-sm"
-            >
-              <span className="truncate max-w-55">
-                {file.name}
-              </span>
-
-              <button
-                type="button"
-                onClick={() => removeFile(index)}
-                className="cursor-pointer opacity-60 hover:opacity-100"
-                title="Remove file"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="w-full">
         <div className="w-full flex items-center gap-3 border border-light-text/35 dark:border-dark-text/35 rounded-full bg-light-bar dark:bg-dark-bar p-[0.6rem_0.9rem_0.6rem_0.5rem] transition-colors">
           <input
@@ -195,6 +171,29 @@ export default function HeroInput({
           </div>
         </div>
       </form>
+            {files.length > 0 && (
+        <div className="w-full flex flex-wrap gap-2">
+          {files.map((file, index) => (
+            <div
+              key={`${file.name}-${file.size}`}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-light-bar dark:bg-dark-bar text-light-text dark:text-dark-text text-sm"
+            >
+              <span className="truncate max-w-55">
+                {file.name}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => removeFile(index)}
+                className="cursor-pointer opacity-60 hover:opacity-100"
+                title="Remove file"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }
