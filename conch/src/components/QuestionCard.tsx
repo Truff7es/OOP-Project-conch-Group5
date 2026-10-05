@@ -99,8 +99,8 @@ export default function QuestionCard({
   }
 
   return (
-    <div className="w-full max-w-2xl">
-      <div className="flex flex-col gap-4 bg-light-bar dark:bg-dark-bar p-6 rounded-2xl transition-colors">
+    <div className="w-full max-w-3xl">
+      <div className="flex flex-col gap-4 p-6 rounded-2xl transition-colors">
         <div className="text-sm text-light-text/70 dark:text-dark-text/70">
           Question {id} - {typeNames[type]}
         </div>
@@ -160,8 +160,9 @@ export default function QuestionCard({
                       ? toggleChoice(choice)
                       : onSelectChoice(choice)
                   }
-                  className={`flex items-center gap-3 p-4 w-full rounded-2xl bg-light-bg dark:bg-dark-bg text-left text-light-text dark:text-dark-text transition-opacity selection:bg-light-text selection:text-light-bg dark:selection:bg-dark-text dark:selection:text-dark-bg ${
-                    isSelected ? '' : 'hover:opacity-90'
+                  className={`flex cursor-pointer items-center gap-3 p-4 w-full rounded-2xl transition-all duration-150 ease-in-out
+                      dark:hover:bg-light-bar/10 hover:bg-dark-bar/10 text-left text-light-text dark:text-dark-text ${
+                    isSelected ? 'dark:bg-light-bar/10 bg-dark-bar/10' : 'hover:opacity-90'
                   }`}
                 >
                   <div

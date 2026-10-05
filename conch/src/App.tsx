@@ -43,11 +43,35 @@ export default function App() {
   const [questioncount, setQuestioncount] =
     useState('5')
 
-  const [questions, setQuestions] =
-    useState<QuizQuestion[]>([])
+    const [questions, setQuestions] = useState<QuizQuestion[]>(() => {
+      if (typeof window === 'undefined') return []
+      const saved = localStorage.getItem('quiz_questions')
+      if (!saved) return []
+      try {
+        return JSON.parse(saved)
+      } catch (e) {
+        console.error('Failed to parse quiz_questions from storage:', e)
+        return []
+      }
+    })
 
-  const [currentIndex, setCurrentIndex] =
-    useState(0)
+    const [answers, setAnswers] = useState<Record<number, string>>(() => {
+      if (typeof window === 'undefined') return {}
+      const saved = localStorage.getItem('quiz_answers')
+      if (!saved) return {}
+      try {
+        return JSON.parse(saved)
+      } catch (e) {
+        console.error('Failed to parse quiz_answers from storage:', e)
+        return {}
+      }
+    })
+
+  const [currentIndex, setCurrentIndex] = useState<number>(() => {
+    if (typeof window === 'undefined') return 0
+    const saved = localStorage.getItem('quiz_current_index')
+    return saved ? Number(saved) : 0
+  })
 
   const [loading, setLoading] =
     useState(false)
@@ -58,17 +82,29 @@ export default function App() {
   const [files, setFiles] =
     useState<File[]>([])
 
-  const [answers, setAnswers] =
-    useState<Record<number, string>>({})
-
   const [fetchPhase, setFetchPhase] =
     useState<FetchPhase>('idle')
 
-  const [showQuestions, setShowQuestions] =
-    useState(false)
+  const [showQuestions, setShowQuestions] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false
+    const saved = localStorage.getItem('quiz_questions')
+    if (!saved) return false
+    try {
+      const parsed = JSON.parse(saved)
+      return Array.isArray(parsed) && parsed.length > 0
+    } catch {
+      return false
+    }
+  })
 
   const transitionTimers =
     useRef<number[]>([])
+
+  useEffect(() => {localStorage.setItem('quiz_questions', JSON.stringify(questions))}, [questions])
+
+  useEffect(() => {localStorage.setItem('quiz_current_index', currentIndex.toString())}, [currentIndex])
+
+  useEffect(() => {localStorage.setItem('quiz_answers', JSON.stringify(answers))}, [answers])
 
   const clearTransitionTimers = () => {
     transitionTimers.current.forEach(
@@ -157,17 +193,12 @@ export default function App() {
         doneTimer
       )
     } catch (err) {
-      console.error(err)
-
-      alert(
-        err instanceof Error
-          ? err.message
-          : String(err)
-      )
-
+      console.error("Quiz generation failed: ", err)
       setFetchPhase('idle')
       setLoading(false)
       setShowQuestions(false)
+    } finally {
+      setLoading(false)
     }
   }
 
