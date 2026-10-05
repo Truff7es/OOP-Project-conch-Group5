@@ -160,21 +160,15 @@ export default function QuestionCard({
                       ? toggleChoice(choice)
                       : onSelectChoice(choice)
                   }
-                  className={`flex cursor-pointer items-center gap-3 p-4 w-full rounded-2xl transition-all duration-150 ease-in-out
+                  className={`flex cursor-pointer items-center gap-3 p-4 w-full rounded-2xl transition-all duration-200 ease-in-out
                       dark:hover:bg-light-bar/10 hover:bg-dark-bar/10 text-left text-light-text dark:text-dark-text ${
                     isSelected ? 'dark:bg-light-bar/10 bg-dark-bar/10' : 'hover:opacity-90'
                   }`}
                 >
                   <div
-                    className={`w-5 h-5 shrink-0 border-2 border-light-text dark:border-dark-text ${
-                      type === 'checkbox'
-                        ? 'rounded-md'
-                        : 'rounded-full'
-                    } ${
-                      isSelected
-                        ? 'bg-light-text dark:bg-dark-text'
-                        : ''
-                    }`}
+                    className={`w-5 h-5 shrink-0 border-2 border-light-text dark:border-dark-text transition-all duration-200 ${
+                      type === 'checkbox' ? 'rounded-md': 'rounded-full'} ${
+                      isSelected ? 'bg-light-text dark:bg-dark-text' : '' }`}
                   />
 
                   <span>{choice}</span>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 
 import Navbar from './components/Navbar'
 import FilterGroup from './components/FilterGroup'
@@ -248,7 +249,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-4.5 pb-8 font-mono">
+    <div className="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text flex items-start justify-center pt-6 pb-8 font-mono">
       <div className="flex flex-col gap-4 w-[70vw] max-w-300 min-h-[70vh]">
         <Navbar
           theme={theme}
@@ -325,27 +326,14 @@ export default function App() {
                 <QuestionCard
                   id={currentQuestion.id}
                   type={currentQuestion.type}
-                  question={
-                    currentQuestion.question
-                  }
-                  choices={
-                    currentQuestion.choices
-                  }
-                  selectedChoice={
-                    answers[currentIndex]
-                  }
-                  onSelectChoice={
-                    handleSelectChoice
-                  }
+                  question={currentQuestion.question}
+                  choices={currentQuestion.choices}
+                  selectedChoice={answers[currentIndex]}
+                  onSelectChoice={handleSelectChoice}
                   onNext={handleNext}
                   onPrev={handlePrev}
-                  isFirstQuestion={
-                    currentIndex === 0
-                  }
-                  isLastQuestion={
-                    currentIndex ===
-                    questions.length - 1
-                  }
+                  isFirstQuestion={currentIndex === 0}
+                  isLastQuestion={currentIndex ===questions.length - 1}
                 />
               </div>
             )}
